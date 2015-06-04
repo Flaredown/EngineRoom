@@ -2,7 +2,13 @@
 
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
-var app = new EmberApp();
+var app = new EmberApp({
+
+  dotEnv: {
+    clientAllowedKeys: ['KEEN_PROJECT_ID', 'KEEN_READ_KEY']
+  }
+
+});
 
 // Use `app.import` to add additional libraries to the generated
 // output files.
