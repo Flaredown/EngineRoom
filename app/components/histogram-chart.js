@@ -19,7 +19,6 @@ export default Ember.Component.extend({
     var color = d3.scale.ordinal()
       .range(flaredownColors);
 
-
     // TODO: This should probably go in the route
     // for (var i = res.result.length - 1; i >= 0; i--) {
     //   x = res.result[i];
@@ -31,6 +30,7 @@ export default Ember.Component.extend({
     //   };
     // }
     //
+
     var maxValue = Math.max.apply(null, this.get("data"));
 
     var formatCount = d3.format("d");
