@@ -12,6 +12,7 @@
     "jquery": "^1.11.1",
     "loader.js": "ember-cli/loader.js#3.2.0",
     "qunit": "~1.17.1",
-    "keen-js": "3.2.4"
+    "keen-js": "3.2.4",
+    "d3": "~3.5.5"
   }
 }

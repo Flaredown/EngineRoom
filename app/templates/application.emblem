@@ -1,0 +1,6 @@
+h2 Engine Room
+
+h3 Some chart thinger
+histogram-chart data=model
+
+outlet

@@ -1,0 +1,88 @@
+/*
+ * Full-page application style
+ */
+
+$helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+
+.keen.application {
+  background: #f2f2f2;
+  padding: 60px 20px 0;
+  line-height: 1.2;
+  font-family: $helvetica-neue-stack;
+}
+.keen.application > .container {
+  padding-left: 0;
+  padding-right: 0;
+}
+.keen.application div[class="columns"] {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.keen.application div[class="columns"] div[class="columns"] {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.keen.application hr {
+  border-color: #d7d7d7;
+  margin: 10px 0;
+}
+
+.return-link, .return-link:focus, .return-link:hover {
+  text-decoration: none;
+}
+
+.chart-wrapper {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+.chart-wrapper .chart-title {
+  border-bottom: 1px solid #d7d7d7;
+  color: #666;
+  font-size: 14px;
+  font-weight: 200;
+  padding: 7px 10px 4px;
+}
+
+.chart-wrapper .chart-stage {
+  /*min-height: 240px;*/
+  overflow: hidden;
+  padding: 5px 10px;
+  position: relative;
+}
+
+.chart-wrapper .chart-notes {
+  background: #fbfbfb;
+  border-top: 1px solid #e2e2e2;
+  color: #808080;
+  font-size: 12px;
+  padding: 8px 10px 5px;
+}
+
+// svg stuff for d3
+
+.legend {
+  font-size: 12px;
+}
+
+.axis path {
+  stroke: #000;
+  fill: none;
+}
+
+.axis {
+  font-size: 12px;
+}
+
+.ring-chart text.graph-label {
+  fill: #fff;
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.group path {
+  stroke: #fff;
+  stroke-width: 0.3;
+}

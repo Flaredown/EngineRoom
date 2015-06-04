@@ -37,6 +37,7 @@
     "ember-keen-querying": "0.0.7"
   },
   "dependencies": {
+    "ember-cli-emblem": "^0.2.7",
     "keen-js": "^3.2.4"
   }
 }
