@@ -9,17 +9,24 @@ export default Ember.Route.extend(HistogramMixin, {
     // multiQuery exists too
     // https://github.com/plyfe/ember-keen-querying
 
-    return this.get("keenQuerying").query("count", {
-      eventCollection: "entries",
-      targetProperty: "user_id",
-      groupBy: "n_conditions"
-    });
+    var queryType = "count",
+        eventCollection = "entries",
+        targetProperty = "user_id",
+        groupBy = "n_conditions";
 
-    // Some histo-data
-    // return [[1],[2],[2],[3],[3],[3],[4],[4],[5]];
+    return this.get("keenQuerying").query(queryType, {
+      eventCollection: eventCollection,
+      targetProperty: targetProperty,
+      groupBy: groupBy
+    }).then(function(response) {
+      return {
+        query: response,
+        groupBy: groupBy
+      };
+    });
   },
 
-  afterModel(model) {
+  setupController(controller, model) {
 
     var fillArray = function(value, len) {
       var arr = [];
@@ -29,17 +36,26 @@ export default Ember.Route.extend(HistogramMixin, {
       return arr;
     };
 
-    var values = [];
-
-    for (var i = model.result.length - 1; i >= 0; i--) {
-      var x = model.result[i];
+    var melt = function(data, groupBy) {
+      var melted = [];
+      // TODO: This should probably go in the route
+      for (var i = data.result.length - 1; i >= 0; i--) {
+        var x = data.result[i];
       
-      if (x["n_conditions"] === null) {
-        values = values.concat(fillArray(0, x.result));
-      } else {
-        values = values.concat(fillArray(x["n_conditions"], x.result));
+        if (x[groupBy] === null) {
+          melted = melted.concat(fillArray(0, x.result));
+        } else {
+          melted = melted.concat(fillArray(x[groupBy], x.result));
+        }
       }
-    }
+      return melted;
+    };
+
+    controller.set("model", {
+      raw: model.query.result,
+      melted: melt(model.query, model.groupBy)
+    });
+
   }
 
 });

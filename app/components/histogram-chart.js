@@ -3,8 +3,11 @@ var computed = Em.computed;
 
 export default Ember.Component.extend({
 
-  chartElement: computed("elementId", function () { return "#"+this.get("elementId")+" .chart"; }),
+  chartElement: computed("elementId", function() {
+    return "#" + this.get("elementId") + " .chart";
+  }),
   didInsertElement(){
+
     var flaredownColors = [
       "#ECC916", "#F58A5A", "#D15423",
       "#D47C87", "#C01E55", "#DB9126",
@@ -13,28 +16,15 @@ export default Ember.Component.extend({
     ];
 
     var MARGIN_BASE = 12;
-    var KEEN_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%LZ";
-    var DISPLAY_DATE_FORMAT = "%b %d";
 
     var color = d3.scale.ordinal()
       .range(flaredownColors);
-
-    // TODO: This should probably go in the route
-    // for (var i = res.result.length - 1; i >= 0; i--) {
-    //   x = res.result[i];
-    //
-    //   if (x[groupBy] === null) {
-    //     this.get("data") = this.get("data").concat(fillArray(0, x.result));
-    //   } else {
-    //     this.get("data") = this.get("data").concat(fillArray(x[groupBy], x.result));
-    //   };
-    // }
-    //
-
-    var maxValue = Math.max.apply(null, this.get("data"));
+    
+    var maxValue = Math.max.apply(null, this.get("data").melted);
 
     var formatCount = d3.format("d");
 
+    // TODO right margin isn't looking correct, is it?
     var chartWidth = parseInt(d3.select(this.get("element")).style('width'), 10);
     var chartHeight = 250;
 
@@ -60,7 +50,7 @@ export default Ember.Component.extend({
     // Generate a histogram using n uniformly-spaced bins.
     var data = d3.layout.histogram()
         .bins(x.ticks(nBins))
-        (this.get("data"));
+        (this.get("data").melted);
 
     var y = d3.scale.linear()
         .domain([0, d3.max(data, function(d) { return d.y; })])
