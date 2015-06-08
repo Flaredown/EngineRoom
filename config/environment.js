@@ -13,6 +13,17 @@ module.exports = function(environment) {
       }
     },
 
+    KPI: {
+      "engagement":{
+        "metrics": [
+          {
+            "queryType": "bla",
+            "chartType": "histogram"
+          }
+        ]
+      }
+    },
+
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created

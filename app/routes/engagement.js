@@ -1,9 +1,11 @@
 import Ember from 'ember';
 import HistogramMixin from '../mixins/histogram';
+import config from '../config/environment';
 
 export default Ember.Route.extend(HistogramMixin, {
 
   keenQuerying: Ember.inject.service(),
+  config: config.KPI.engagement,
 
   model() {
     // multiQuery exists too
@@ -41,7 +43,7 @@ export default Ember.Route.extend(HistogramMixin, {
       // TODO: This should probably go in the route
       for (var i = data.result.length - 1; i >= 0; i--) {
         var x = data.result[i];
-      
+
         if (x[groupBy] === null) {
           melted = melted.concat(fillArray(0, x.result));
         } else {
@@ -51,10 +53,18 @@ export default Ember.Route.extend(HistogramMixin, {
       return melted;
     };
 
-    controller.set("model", {
-      raw: model.query.result,
-      melted: melt(model.query, model.groupBy)
-    });
+    var fakeModel = [
+      {
+        raw: model.query.result,
+        melted: melt(model.query, model.groupBy)
+      },
+      {
+        raw: model.query.result,
+        melted: melt(model.query, model.groupBy)
+      }
+    ];
+
+    controller.set("model", fakeModel);
 
   }
 

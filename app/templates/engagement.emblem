@@ -1,0 +1,4 @@
+histogram-chart data=histoOne
+histogram-chart data=histoTwo
+
+outlet
