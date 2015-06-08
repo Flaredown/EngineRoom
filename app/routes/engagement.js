@@ -1,3 +1,5 @@
+/* global Keen */
+
 import Ember from 'ember';
 import HistogramMixin from '../mixins/histogram';
 import config from '../config/environment';
@@ -8,23 +10,31 @@ export default Ember.Route.extend(HistogramMixin, {
   config: config.KPI.engagement,
 
   model() {
-    // multiQuery exists too
-    // https://github.com/plyfe/ember-keen-querying
 
-    var queryType = "count",
-        eventCollection = "entries",
-        targetProperty = "user_id",
-        groupBy = "n_conditions";
+    var keenQueries = this.get("config").metrics.map(function(metric) {
+      return new Keen.Query(metric.queryType, metric.queryParams);
+    });
 
-    return this.get("keenQuerying").query(queryType, {
-      eventCollection: eventCollection,
-      targetProperty: targetProperty,
-      groupBy: groupBy
+    var zip = function(arrays) {
+      return arrays[0].map(function(_, i) {
+        return arrays.map(function(array) {
+          return array[i];
+        });
+      });
+    };
+
+    var self = this;
+    return new Ember.RSVP.Promise(function(resolve, reject) {
+      self.get("keenQuerying.client").run(keenQueries, function(err, res) {
+        if (err) {
+          reject(err);
+        }
+        else {
+          resolve(res);
+        }
+      });
     }).then(function(response) {
-      return {
-        query: response,
-        groupBy: groupBy
-      };
+      return zip([response, self.get("config").metrics]);
     });
   },
 
@@ -40,7 +50,7 @@ export default Ember.Route.extend(HistogramMixin, {
 
     var melt = function(data, groupBy) {
       var melted = [];
-      // TODO: This should probably go in the route
+
       for (var i = data.result.length - 1; i >= 0; i--) {
         var x = data.result[i];
 
@@ -53,18 +63,16 @@ export default Ember.Route.extend(HistogramMixin, {
       return melted;
     };
 
-    var fakeModel = [
-      {
-        raw: model.query.result,
-        melted: melt(model.query, model.groupBy)
-      },
-      {
-        raw: model.query.result,
-        melted: melt(model.query, model.groupBy)
-      }
-    ];
+    var processedModel = model.map(function(m) {
+      var query = m[0],
+          specs = m[1];
+      return {
+        raw: query.result,
+        melted: melt(query, specs.queryParams.groupBy)
+      };
+    });
 
-    controller.set("model", fakeModel);
+    controller.set("model", processedModel);
 
   }
 

@@ -14,12 +14,26 @@ module.exports = function(environment) {
     },
 
     KPI: {
-      "engagement":{
+      "engagement": {
         "metrics": [
           {
-            "queryType": "bla",
-            "chartType": "histogram"
-          }
+            "chartType": "histogram",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "user_id",
+              "groupBy": "n_conditions"
+            }
+          },
+          {
+            "chartType": "histogram",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "user_id",
+              "groupBy": "n_symptoms"
+            }
+          }          
         ]
       }
     },
