@@ -40,41 +40,22 @@ export default Ember.Route.extend(HistogramMixin, {
 
   setupController(controller, model) {
 
-    var fillArray = function(value, len) {
-      var arr = [];
-      for (var i = 0; i < len; i++) {
-        arr.push(value);
-      }
-      return arr;
-    };
-
-    var melt = function(data, groupBy) {
-      var melted = [];
-
-      for (var i = data.result.length - 1; i >= 0; i--) {
-        var x = data.result[i];
-
-        if (x[groupBy] === null) {
-          melted = melted.concat(fillArray(0, x.result));
-        } else {
-          melted = melted.concat(fillArray(x[groupBy], x.result));
-        }
-      }
-      return melted;
-    };
+    var self = this;
 
     var processedModel = model.map(function(m) {
       var query = m[0],
           specs = m[1];
+
+      // TODO: case logic ripe for a refactor
       if (specs.chartType === "histogram"){
+        var processData = self.get("processData");
         return {
           specs: specs,
-          melted: melt(query, specs.queryParams.groupBy)
+          melted: processData(query, specs.queryParams.groupBy)
         };
       } else {
         throw "Unexpected chartType!";
       }
-
     });
 
     controller.set("model", processedModel);
