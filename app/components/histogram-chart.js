@@ -18,6 +18,8 @@ export default Ember.Component.extend({
     ];
 
     var MARGIN_BASE = 12;
+    var PADDING_RIGHT = 10;
+    var PADDING_TOP = 0;
 
     var color = d3.scale.ordinal()
       .range(flaredownColors);
@@ -26,8 +28,7 @@ export default Ember.Component.extend({
 
     var formatCount = d3.format("d");
 
-    // TODO right margin isn't looking correct, is it?
-    var chartWidth = parseInt(d3.select(this.get("element")).style('width'), 10);
+    var chartWidth = parseInt(d3.select(this.get("chartElement")).style('width'), 10);
     var chartHeight = 250;
 
     var xAxisRoom = 13;
@@ -47,7 +48,7 @@ export default Ember.Component.extend({
 
     var x = d3.scale.linear()
         .domain([0, maxValue + 1])
-        .range([0, width]);
+        .range([0, width - PADDING_RIGHT]);
 
     // Generate a histogram using n uniformly-spaced bins.
     var data = d3.layout.histogram()
@@ -56,7 +57,7 @@ export default Ember.Component.extend({
 
     var y = d3.scale.linear()
         .domain([0, d3.max(data, function(d) { return d.y; })])
-        .range([height, 0]);
+        .range([height, 0 + PADDING_TOP]);
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -71,7 +72,7 @@ export default Ember.Component.extend({
         .tickSubdivide(0);
 
     var svg = d3.select(this.get("chartElement")).append("svg")
-        .attr("width", width + margin.left + margin.right)
+        .attr("width", width + margin.left)
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -90,7 +91,7 @@ export default Ember.Component.extend({
 
     svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0, " + height + ")")
         .call(xAxis);
 
     svg.append("g")
