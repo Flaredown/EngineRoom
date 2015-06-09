@@ -28,7 +28,7 @@ export default Ember.Component.extend({
 
     var formatCount = d3.format("d");
 
-    var chartWidth = parseInt(d3.select(this.get("chartElement")).style('width'), 10);
+    var chartWidth = parseInt(d3.select(this.get("chartElement")).style("width"), 10);
     var chartHeight = 250;
 
     var xAxisRoom = 13;
