@@ -1,3 +1,5 @@
+/* global Em, d3 */
+
 import Ember from "ember";
 var computed = Em.computed;
 
