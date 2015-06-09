@@ -1,4 +1,4 @@
-/* global Ember, equal */
+/* global Ember, equal, ok */
 
 import { moduleForComponent, test } from 'ember-qunit';
 import histogramChartFixture from '../fixtures/histogram-chart-fixture';
@@ -21,5 +21,14 @@ test("it renders", function() {
   equal(component._state, "preRender");
 
   this.render();
+
   equal(component._state, "inDOM");
+});
+
+test("it draws an svg", function() {
+  var component = this.subject();
+
+  this.render();
+
+  ok(component.$().find("svg"));
 });
