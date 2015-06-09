@@ -1,8 +1,8 @@
 /* global Keen */
 
-import Ember from 'ember';
-import HistogramMixin from '../mixins/histogram';
-import config from '../config/environment';
+import Ember from "ember";
+import HistogramMixin from "../mixins/histogram";
+import config from "../config/environment";
 
 export default Ember.Route.extend(HistogramMixin, {
 
