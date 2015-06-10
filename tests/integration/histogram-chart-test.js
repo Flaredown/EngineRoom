@@ -1,5 +1,3 @@
-/* global Ember, equal, ok */
-
 import { moduleForComponent, test } from 'ember-qunit';
 import histogramChartFixture from '../fixtures/histogram-chart-fixture';
 

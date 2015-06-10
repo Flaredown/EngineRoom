@@ -1,5 +1,3 @@
-/* global Keen */
-
 import Ember from "ember";
 import HistogramMixin from "../mixins/histogram";
 import config from "../config/environment";

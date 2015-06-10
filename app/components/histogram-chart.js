@@ -1,5 +1,3 @@
-/* global Em, d3 */
-
 import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
