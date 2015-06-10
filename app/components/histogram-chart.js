@@ -11,16 +11,10 @@ export default Ember.Component.extend(Chart, {
   }),
   didInsertElement(){
 
-    var MARGIN_BASE = 12;
-    var PADDING_RIGHT = 10;
-    var PADDING_TOP = 0;
-
     var color = d3.scale.ordinal()
       .range(this.get("colorPalette"));
     
     var maxValue = Math.max.apply(null, this.get("data").melted);
-
-    var formatCount = d3.format("d");
 
     var chartWidth = parseInt(d3.select(this.get("chartElement")).style("width"), 10);
     var chartHeight = 250;
@@ -29,10 +23,10 @@ export default Ember.Component.extend(Chart, {
     var yAxisRoom = 20;
 
     var margin = {
-      top: MARGIN_BASE,
-      right: MARGIN_BASE,
-      bottom: MARGIN_BASE + xAxisRoom,
-      left: MARGIN_BASE + yAxisRoom
+      top: this.get("marginBase"),
+      right: this.get("marginBase"),
+      bottom: this.get("marginBase") + xAxisRoom,
+      left: this.get("marginBase") + yAxisRoom
     };
 
     var width = chartWidth - margin.left - margin.right,
@@ -42,7 +36,7 @@ export default Ember.Component.extend(Chart, {
 
     var x = d3.scale.linear()
         .domain([0, maxValue + 1])
-        .range([0, width - PADDING_RIGHT]);
+        .range([0, width - this.get("paddingRight")]);
 
     // Generate a histogram using n uniformly-spaced bins.
     var data = d3.layout.histogram()
@@ -51,7 +45,7 @@ export default Ember.Component.extend(Chart, {
 
     var y = d3.scale.linear()
         .domain([0, d3.max(data, function(d) { return d.y; })])
-        .range([height, 0 + PADDING_TOP]);
+        .range([height, 0 + this.get("paddingTop")]);
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -62,7 +56,7 @@ export default Ember.Component.extend(Chart, {
         .scale(y)
         .orient("left")
         .ticks(4)
-        .tickFormat(formatCount)
+        .tickFormat(this.get("formatCount"))
         .tickSubdivide(0);
 
     var svg = d3.select(this.get("chartElement")).append("svg")
