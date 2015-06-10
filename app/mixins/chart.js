@@ -18,8 +18,16 @@ export default Ember.Mixin.create({
 
   colorPalette: FLAREDOWN_COLORS,
   formatCount: d3.format("d"),
-  marginBase: MARGIN_BASE,
   paddingRight: PADDING_RIGHT,
-  paddingTop: PADDING_TOP
+  paddingTop: PADDING_TOP,
+
+  margin: function(xAxisRoom, yAxisRoom) {
+    return {
+      top: MARGIN_BASE,
+      right: MARGIN_BASE,
+      bottom: MARGIN_BASE + xAxisRoom,
+      left: MARGIN_BASE + yAxisRoom
+    };
+  }
 
 });

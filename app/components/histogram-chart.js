@@ -4,6 +4,19 @@ import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
 
+function drawXAxis(axis, target, height) {
+  target.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0, " + height + ")")
+    .call(axis);
+}
+
+function drawYAxis(axis, target) {
+  target.append("g")
+    .attr("class", "y axis")
+    .call(axis);
+}
+
 export default Ember.Component.extend(Chart, {
 
   chartElement: computed("elementId", function() {
@@ -22,12 +35,7 @@ export default Ember.Component.extend(Chart, {
     var xAxisRoom = 13;
     var yAxisRoom = 20;
 
-    var margin = {
-      top: this.get("marginBase"),
-      right: this.get("marginBase"),
-      bottom: this.get("marginBase") + xAxisRoom,
-      left: this.get("marginBase") + yAxisRoom
-    };
+    var margin = this.get("margin")(xAxisRoom, yAxisRoom);
 
     var width = chartWidth - margin.left - margin.right,
         height = chartHeight - margin.top - margin.bottom;
@@ -77,14 +85,8 @@ export default Ember.Component.extend(Chart, {
         .attr("width", function(d) { return x(d.dx) - 1; })
         .attr("height", function(d) { return height - y(d.y); });
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0, " + height + ")")
-        .call(xAxis);
-
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
+    drawXAxis(xAxis, svg, height);
+    drawYAxis(yAxis, svg);
 
   }
 
