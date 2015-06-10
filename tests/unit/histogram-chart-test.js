@@ -32,3 +32,16 @@ test("it draws an svg", function() {
 
   ok(component.$().find("svg"));
 });
+
+test("it draws the right number of bars", function() {
+  var expected_n_bars = 5;
+
+  var component = this.subject();  
+  
+  this.render();
+
+  var svg = component.$().find("svg");
+  var bars = svg.find(".bar");
+
+  equal(bars.length, expected_n_bars);
+});
