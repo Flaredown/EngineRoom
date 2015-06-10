@@ -1,28 +1,22 @@
 /* global Em, d3 */
 
 import Ember from "ember";
+import Chart from "../mixins/chart";
 var computed = Em.computed;
 
-export default Ember.Component.extend({
+export default Ember.Component.extend(Chart, {
 
   chartElement: computed("elementId", function() {
     return "#" + this.get("elementId") + " .chart";
   }),
   didInsertElement(){
 
-    var flaredownColors = [
-      "#ECC916", "#F58A5A", "#D15423",
-      "#D47C87", "#C01E55", "#DB9126",
-      "#B83B8A", "#ED80B2", "#F27071",
-      "#F7A8A8"
-    ];
-
     var MARGIN_BASE = 12;
     var PADDING_RIGHT = 10;
     var PADDING_TOP = 0;
 
     var color = d3.scale.ordinal()
-      .range(flaredownColors);
+      .range(this.get("colorPalette"));
     
     var maxValue = Math.max.apply(null, this.get("data").melted);
 
