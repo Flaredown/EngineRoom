@@ -19,6 +19,15 @@ export default Ember.Mixin.create({
   paddingRight: PADDING_RIGHT,
   paddingTop: PADDING_TOP,
 
+  drawSvg: function(element, width, height, margin) {
+    // violates command-query separation by having side effects and returning value
+    return d3.select(element).append("svg")
+        .attr("width", width + margin.left)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");  
+  },
+
   margin: function(xAxisRoom, yAxisRoom) {
     return {
       top: MARGIN_BASE,
