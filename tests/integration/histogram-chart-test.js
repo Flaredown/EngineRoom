@@ -31,6 +31,21 @@ test("it draws an svg", function() {
   ok(component.$().find("svg"));
 });
 
+test("it draws the svg to the right width", function() {
+  var component = this.subject();
+
+  this.render();
+
+  var chartDiv = component.$().find(".chart");
+
+  var marginRight = component.get("margin")(0, 0).right;
+  var expectedSvgWidth = chartDiv.width() - marginRight;
+
+  var svg = component.$().find("svg");
+
+  equal(svg.width(), expectedSvgWidth);
+});
+
 test("it draws the right number of bars", function() {
   var expected_n_bars = 5;
 

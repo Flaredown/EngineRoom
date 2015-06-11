@@ -2,7 +2,7 @@ import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
 
-function _chartWidth(element) {
+function _chartDivWidth(element) {
   return parseInt((element).style("width"), 10);
 }
 
@@ -54,7 +54,7 @@ export default Ember.Component.extend(Chart, {
     
     var maxValue = Math.max.apply(null, this.get("data").melted);
 
-    var chartWidth = _chartWidth(d3.select(this.get("chartElement")));
+    var chartDivWidth = _chartDivWidth(d3.select(this.get("chartElement")));
     var chartHeight = 250;
 
     var xAxisRoom = 13;
@@ -62,7 +62,7 @@ export default Ember.Component.extend(Chart, {
 
     var margin = this.get("margin")(xAxisRoom, yAxisRoom);
 
-    var width = chartWidth - margin.left - margin.right,
+    var width = chartDivWidth - margin.left - margin.right,
         height = chartHeight - margin.top - margin.bottom;
 
     var nBins = _nBins(maxValue, width);

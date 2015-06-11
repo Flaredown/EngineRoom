@@ -4,9 +4,17 @@ import ChartMixin from "../../mixins/chart";
 moduleFor("mixin:chart", "ChartMixin");
 
 
-test("it works", function() {
+test("margins are calculated with room for axes", function() {
   var DummyObject = Ember.Object.extend(ChartMixin);
   var subject = DummyObject.create();
 
-  ok(subject);
+  var xAxisRoom = 10;
+  var yAxisRoom = 20;
+  var marginBase = 12;
+  var margin = subject.get("margin")(xAxisRoom, yAxisRoom);
+  
+  equal(margin.top, marginBase);
+  equal(margin.right, marginBase);
+  equal(margin.bottom, marginBase + xAxisRoom);
+  equal(margin.left, marginBase + yAxisRoom);
 });
