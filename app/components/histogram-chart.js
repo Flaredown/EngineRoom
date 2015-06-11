@@ -66,16 +66,14 @@ export default Ember.Component.extend(Chart, {
       this.get("yAxisRoom")
     );
 
-    // I'm getting suspicious of calling these `width` and `height`
-    // since they rarely get used without margins or padding
-    var width = this.get("chartDivWidth") - margin.left - margin.right,
-        height = this.get("chartDivHeight") - margin.top - margin.bottom;
+    var plotWidth = this.get("chartDivWidth") - margin.left - margin.right,
+        plotHeight = this.get("chartDivHeight") - margin.top - margin.bottom;
 
-    var nBins = _nBins(maxValue, width);
+    var nBins = _nBins(maxValue, plotWidth);
 
     var x = d3.scale.linear()
         .domain([0, maxValue + 1])
-        .range([0, width - this.get("paddingRight")]);
+        .range([0, plotWidth - this.get("paddingRight")]);
 
     var data = d3.layout.histogram()
         .bins(x.ticks(nBins))
@@ -83,7 +81,7 @@ export default Ember.Component.extend(Chart, {
 
     var y = d3.scale.linear()
         .domain([0, d3.max(data, function(d) { return d.y; })])
-        .range([height, 0 + this.get("paddingTop")]);
+        .range([plotHeight, 0 + this.get("paddingTop")]);
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -97,9 +95,9 @@ export default Ember.Component.extend(Chart, {
         .tickFormat(this.get("formatCount"))
         .tickSubdivide(0);
 
-    var svg = this.get("drawSvg")(this.get("chartElement"), width, height, margin);
-    _drawBars(data, x, y, svg, height, color);
-    _drawXAxis(xAxis, svg, height);
+    var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, margin);
+    _drawBars(data, x, y, svg, plotHeight, color);
+    _drawXAxis(xAxis, svg, plotHeight);
     _drawYAxis(yAxis, svg);
   }
 
