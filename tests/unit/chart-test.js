@@ -13,8 +13,8 @@ test("margins are calculated with room for axes", function() {
   var marginBase = 12;
   var margin = subject.get("margin")(xAxisRoom, yAxisRoom);
   
-  equal(margin.top, marginBase);
-  equal(margin.right, marginBase);
-  equal(margin.bottom, marginBase + xAxisRoom);
-  equal(margin.left, marginBase + yAxisRoom);
+  equal(margin.top, marginBase, "top");
+  equal(margin.right, marginBase, "right");
+  equal(margin.bottom, marginBase + xAxisRoom, "bottom");
+  equal(margin.left, marginBase + yAxisRoom, "left");
 });

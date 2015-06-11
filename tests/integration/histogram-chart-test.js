@@ -43,8 +43,8 @@ test("it sizes the svg based on div size and margin options", function() {
   var expectedSvgWidth = chartDiv.width() - margin.right;
   var expectedSvgHeight = component.get("chartDivHeight");
 
-  equal(svg.width(), expectedSvgWidth);
-  equal(svg.height(), expectedSvgHeight);
+  equal(svg.width(), expectedSvgWidth, "width");
+  equal(svg.height(), expectedSvgHeight, "height");
 });
 
 test("it draws as many bars as the maximum value + 1 for a small dataset", function() {
