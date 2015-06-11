@@ -21,6 +21,7 @@ export default Ember.Mixin.create({
 
   drawSvg: function(element, width, height, margin) {
     // violates command-query separation by having side effects and returning value
+
     return d3.select(element).append("svg")
         .attr("width", width + margin.left)
         .attr("height", height + margin.top + margin.bottom)
