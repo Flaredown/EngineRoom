@@ -66,6 +66,8 @@ export default Ember.Component.extend(Chart, {
       this.get("yAxisRoom")
     );
 
+    // I'm getting suspicious of calling these `width` and `height`
+    // since they rarely get used without margins or padding
     var width = this.get("chartDivWidth") - margin.left - margin.right,
         height = this.get("chartDivHeight") - margin.top - margin.bottom;
 

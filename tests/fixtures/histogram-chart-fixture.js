@@ -1,16 +1,30 @@
 var fixture = function(){
 
   return {
-    specs: {
-      "chartType": "histogram",
-      "queryType": "count_unique",
-      "queryParams": {
-        "eventCollection": "entries",
-        "targetProperty": "user_id",
-        "groupBy": "n_conditions"
-      }
+    small: {
+      specs: {
+        "chartType": "histogram",
+        "queryType": "count_unique",
+        "queryParams": {
+          "eventCollection": "entries",
+          "targetProperty": "user_id",
+          "groupBy": "n_conditions"
+        }
+      },
+      melted: [0, 1, 1, 3, 3, 4]
     },
-    melted: [0, 1, 1, 2, 3, 3, 4]
+    large: {
+      specs: {
+        "chartType": "histogram",
+        "queryType": "count_unique",
+        "queryParams": {
+          "eventCollection": "entries",
+          "targetProperty": "user_id",
+          "groupBy": "n_conditions"
+        }
+      },
+      melted: [0, 1, 1, 2, 3, 3, 4, 45, 90]
+    },    
   };
 };
 
