@@ -33,7 +33,17 @@ module.exports = function(environment) {
               "targetProperty": "user_id",
               "groupBy": "n_symptoms"
             }
-          }          
+          },
+          {
+            "chartType": "line",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "user_id",
+              "timeframe": "this_14_days",
+              "interval": "daily"
+            }
+          }
         ]
       }
     },

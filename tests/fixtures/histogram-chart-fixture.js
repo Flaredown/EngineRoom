@@ -11,7 +11,7 @@ var fixture = function(){
           "groupBy": "n_conditions"
         }
       },
-      melted: [0, 1, 1, 3, 3, 4]
+      processed: [0, 1, 1, 3, 3, 4]
     },
     large: {
       specs: {
@@ -23,7 +23,7 @@ var fixture = function(){
           "groupBy": "n_conditions"
         }
       },
-      melted: [0, 1, 1, 2, 3, 3, 4, 45, 90]
+      processed: [0, 1, 1, 2, 3, 3, 4, 45, 90]
     },    
   };
 };

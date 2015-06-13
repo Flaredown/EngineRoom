@@ -33,7 +33,7 @@ test("grouped data is processed by melting", function() {
       }
     ]
   };
-  var processedData = subject.get("processData")(data, "groupBy");
+  var processedData = subject.get("processHistogram")(data, "groupBy");
 
   var expectedResult = [0, 0, 0, 0, 0, 1, 1, 2];
 

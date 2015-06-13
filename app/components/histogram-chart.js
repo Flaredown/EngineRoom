@@ -51,7 +51,7 @@ export default Ember.Component.extend(Chart, {
 
     this.set("chartDivWidth",
       _chartDivWidth(d3.select(this.get("chartElement")))
-      );
+    );
     this.set("chartDivHeight", 250);
     this.set("xAxisRoom", 13);
     this.set("yAxisRoom", 20);
@@ -59,7 +59,7 @@ export default Ember.Component.extend(Chart, {
     var color = d3.scale.ordinal()
       .range(this.get("colorPalette"));
     
-    var maxValue = Math.max.apply(null, this.get("data").melted);
+    var maxValue = Math.max.apply(null, this.get("data").processed);
 
     var margin = this.get("margin")(
       this.get("xAxisRoom"),
@@ -77,7 +77,7 @@ export default Ember.Component.extend(Chart, {
 
     var data = d3.layout.histogram()
         .bins(x.ticks(nBins))
-        (this.get("data").melted);
+        (this.get("data").processed);
 
     var y = d3.scale.linear()
         .domain([0, d3.max(data, function(d) { return d.y; })])
@@ -99,6 +99,7 @@ export default Ember.Component.extend(Chart, {
     _drawBars(data, x, y, svg, plotHeight, color);
     _drawXAxis(xAxis, svg, plotHeight);
     _drawYAxis(yAxis, svg);
+
   }
 
 });

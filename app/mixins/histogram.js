@@ -26,7 +26,7 @@ function melt(data, groupBy) {
 
 export default Ember.Mixin.create({
 
-  processData: function(query, groupBy) {
+  processHistogram: function(query, groupBy) {
     return melt(query, groupBy);
   }
 
