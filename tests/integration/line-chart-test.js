@@ -22,27 +22,37 @@ test("it renders", function() {
   equal(component._state, "inDOM");
 });
 
-// test("it draws an svg", function() {
-//   var component = this.subject();
-//   this.render();
+test("it draws an svg", function() {
+  var component = this.subject();
+  this.render();
 
-//   ok(component.$().find("svg"));
-// });
+  ok(component.$().find("svg"));
+});
 
-// test("it sizes the svg based on div size and margin options", function() {
-//   var component = this.subject();
-//   this.render();
+test("it sizes the svg based on div size and margin options", function() {
+  var component = this.subject();
+  this.render();
 
-//   var svg = component.$().find("svg");
+  var svg = component.$().find("svg");
 
-//   var chartDiv = component.$().find(".chart");
-//   var margin = component.get("margin")(
-//     component.get("xAxisRoom"),
-//     component.get("yAxisRoom")
-//   );
-//   var expectedSvgWidth = chartDiv.width() - margin.right;
-//   var expectedSvgHeight = component.get("chartDivHeight");
+  var chartDiv = component.$().find(".chart");
+  var margin = component.get("margin")(
+    component.get("xAxisRoom"),
+    component.get("yAxisRoom")
+  );
+  var expectedSvgWidth = chartDiv.width() - margin.right;
+  var expectedSvgHeight = component.get("chartDivHeight");
 
-//   equal(svg.width(), expectedSvgWidth, "width");
-//   equal(svg.height(), expectedSvgHeight, "height");
-// });
+  equal(svg.width(), expectedSvgWidth, "width");
+  equal(svg.height(), expectedSvgHeight, "height");
+});
+
+test("it draws a line", function() {
+  var component = this.subject();  
+  this.render();
+
+  var svg = component.$().find("svg");
+  var line = svg.find(".line");
+
+  ok(line);
+});
