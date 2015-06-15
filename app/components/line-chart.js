@@ -22,19 +22,6 @@ function _drawLine(data, xScale, yScale, target, color) {
     .attr("d", line);
 }
 
-function _drawXAxis(axis, target, height) {
-  target.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0, " + height + ")")
-    .call(axis);
-}
-
-function _drawYAxis(axis, target) {
-  target.append("g")
-    .attr("class", "y axis")
-    .call(axis);
-}
-
 var n_days = 21;  // TODO un-hardcode
 
 export default Ember.Component.extend(Chart, {
@@ -51,7 +38,7 @@ export default Ember.Component.extend(Chart, {
   chartElement: computed("elementId", function() {
     return "#" + this.get("elementId") + " .chart";
   }),
-  
+
   didInsertElement(){
 
     this.set("chartDivWidth",

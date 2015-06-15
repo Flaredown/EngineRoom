@@ -25,19 +25,6 @@ function _drawBars(data, xScale, yScale, target, height, colorScale) {
 
 }
 
-function _drawXAxis(axis, target, height) {
-  target.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0, " + height + ")")
-    .call(axis);
-}
-
-function _drawYAxis(axis, target) {
-  target.append("g")
-    .attr("class", "y axis")
-    .call(axis);
-}
-
 function _nBins(maxValue, width) {
   return Math.min(maxValue + 1, width / 20);
 }
