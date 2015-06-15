@@ -85,3 +85,14 @@ test("it draws axes", function() {
   ok(xAxis);
   ok(yAxis);
 });
+
+test("it writes a chart title", function() {
+  var component = this.subject();
+  this.render();
+
+  var title = component.$().find(".chart-title");
+
+  var expectedTitle = "Shop";
+
+  equal(title.text(), expectedTitle);
+});

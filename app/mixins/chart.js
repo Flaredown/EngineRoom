@@ -32,6 +32,11 @@ export default Ember.Mixin.create({
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");  
   },
 
+  drawTitle: function(element) {
+    var title = "Cheese";
+    d3.select(element).select(".chart-title").text(title);
+  },
+
   drawXAxis: function(axis, target, height) {
     target.append("g")
       .attr("class", "x axis")
@@ -52,6 +57,6 @@ export default Ember.Mixin.create({
       bottom: MARGIN_BASE + xAxisRoom,
       left: MARGIN_BASE + yAxisRoom
     };
-  }
+  },
 
 });
