@@ -26,6 +26,14 @@ var n_days = 21;  // TODO un-hardcode
 
 export default Ember.Component.extend(Chart, {
 
+  chartDivWidth: computed("chartElement", function() {
+    return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
+  }),
+
+  chartElement: computed("elementId", function() {
+    return "#" + this.get("elementId") + " .chart";
+  }),
+
   titleString: computed("data", function() {
   var spec = this.get("data").specs;
   return spec.queryType +
@@ -35,15 +43,8 @@ export default Ember.Component.extend(Chart, {
     " over " + spec.queryParams.timeframe;
   }),
 
-  chartElement: computed("elementId", function() {
-    return "#" + this.get("elementId") + " .chart";
-  }),
-
   didInsertElement(){
 
-    this.set("chartDivWidth",
-      _chartDivWidth(d3.select(this.get("chartElement")))
-    );
     this.set("chartDivHeight", 250);
     this.set("xAxisRoom", 13);
     this.set("yAxisRoom", 25);

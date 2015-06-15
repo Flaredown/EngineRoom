@@ -2,10 +2,6 @@ import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
 
-function _chartDivWidth(element) {
-  return parseInt((element).style("width"), 10);
-}
-
 function _drawBars(data, xScale, yScale, target, height, colorScale) {
 
   var bar = target.selectAll(".bar")
@@ -31,6 +27,14 @@ function _nBins(maxValue, width) {
 
 export default Ember.Component.extend(Chart, {
 
+  chartDivWidth: computed("chartElement", function() {
+    return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
+  }),
+
+  chartElement: computed("elementId", function() {
+    return "#" + this.get("elementId") + " .chart";
+  }),
+
   titleString: computed("data", function() {
   var spec = this.get("data").specs;
   return spec.queryType +
@@ -39,15 +43,8 @@ export default Ember.Component.extend(Chart, {
     " by " + spec.queryParams.groupBy;
   }),
 
-  chartElement: computed("elementId", function() {
-    return "#" + this.get("elementId") + " .chart";
-  }),
-
   didInsertElement(){
 
-    this.set("chartDivWidth",
-      _chartDivWidth(d3.select(this.get("chartElement")))
-    );
     this.set("chartDivHeight", 250);
     this.set("xAxisRoom", 13);
     this.set("yAxisRoom", 20);
