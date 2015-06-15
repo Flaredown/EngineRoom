@@ -73,3 +73,15 @@ test("it draws a reasonable number of bars given the chart width for a large dat
 
   equal(bars.length, expected_n_bars);
 });
+
+test("it draws axes", function() {
+  var component = this.subject();
+  this.render();
+
+  var svg = component.$().find("svg");
+  var xAxis = svg.find(".x");
+  var yAxis = svg.find(".y");
+
+  ok(xAxis);
+  ok(yAxis);
+});

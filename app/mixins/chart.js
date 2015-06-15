@@ -32,6 +32,19 @@ export default Ember.Mixin.create({
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");  
   },
 
+  drawXAxis: function(axis, target, height) {
+    target.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0, " + height + ")")
+      .call(axis);
+  },
+
+  drawYAxis: function(axis, target) {
+    target.append("g")
+      .attr("class", "y axis")
+      .call(axis);
+  },
+
   margin: function(xAxisRoom, yAxisRoom) {
     return {
       top: MARGIN_BASE,

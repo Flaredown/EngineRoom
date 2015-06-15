@@ -56,3 +56,15 @@ test("it draws a line", function() {
 
   ok(line);
 });
+
+test("it draws axes", function() {
+  var component = this.subject();
+  this.render();
+
+  var svg = component.$().find("svg");
+  var xAxis = svg.find(".x");
+  var yAxis = svg.find(".y");
+
+  ok(xAxis);
+  ok(yAxis);
+});

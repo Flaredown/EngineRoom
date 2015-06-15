@@ -93,8 +93,8 @@ export default Ember.Component.extend(Chart, {
     var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, margin);
 
     _drawLine(data, x, y, svg, color());
-    _drawXAxis(xAxis, svg, plotHeight);
-    _drawYAxis(yAxis, svg);
+    this.get("drawXAxis")(xAxis, svg, plotHeight);
+    this.get("drawYAxis")(yAxis, svg);
 
   }
 });
