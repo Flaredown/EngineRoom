@@ -44,9 +44,18 @@ function _nBins(maxValue, width) {
 
 export default Ember.Component.extend(Chart, {
 
+  titleString: computed("data", function() {
+  var spec = this.get("data").specs;
+  return spec.queryType +
+    " " + spec.queryParams.targetProperty +
+    " in " + spec.queryParams.eventCollection +
+    " by " + spec.queryParams.groupBy;
+  }),
+
   chartElement: computed("elementId", function() {
     return "#" + this.get("elementId") + " .chart";
   }),
+
   didInsertElement(){
 
     this.set("chartDivWidth",
@@ -99,6 +108,7 @@ export default Ember.Component.extend(Chart, {
     _drawBars(data, x, y, svg, plotHeight, color);
     this.get("drawXAxis")(xAxis, svg, plotHeight);
     this.get("drawYAxis")(yAxis, svg);
+    this.get("drawTitle")(this.get("titleString"), this.element);
 
   }
 

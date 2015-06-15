@@ -75,7 +75,7 @@ test("it writes a chart title", function() {
 
   var title = component.$().find(".chart-title");
 
-  var expectedTitle = "Shop";
+  var expectedTitle = component.get("titleString");
 
   equal(title.text(), expectedTitle);
 });

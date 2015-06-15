@@ -35,13 +35,23 @@ function _drawYAxis(axis, target) {
     .call(axis);
 }
 
-var n_days = 7;  // TODO un-hardcode
+var n_days = 21;  // TODO un-hardcode
 
 export default Ember.Component.extend(Chart, {
+
+  titleString: computed("data", function() {
+  var spec = this.get("data").specs;
+  return spec.queryType +
+    " " + spec.queryParams.targetProperty +
+    " in " + spec.queryParams.eventCollection +
+    " " + spec.queryParams.interval +
+    " over " + spec.queryParams.timeframe;
+  }),
 
   chartElement: computed("elementId", function() {
     return "#" + this.get("elementId") + " .chart";
   }),
+  
   didInsertElement(){
 
     this.set("chartDivWidth",
@@ -95,7 +105,7 @@ export default Ember.Component.extend(Chart, {
     _drawLine(data, x, y, svg, color());
     this.get("drawXAxis")(xAxis, svg, plotHeight);
     this.get("drawYAxis")(yAxis, svg);
-    this.get("drawTitle")(this.element);
+    this.get("drawTitle")(this.get("titleString"), this.element);
 
   }
 });
