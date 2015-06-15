@@ -2,11 +2,6 @@ import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
 
-// TODO: remove duplication with histogram-chart
-function _chartDivWidth(element) {
-  return parseInt((element).style("width"), 10);
-}
-
 function _drawLine(data, xScale, yScale, target, color) {
 
   var line = d3.svg.line()
