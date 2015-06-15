@@ -1,5 +1,5 @@
 histogram-chart data=histoOne
-histogram-chart data=histoTwo
 line-chart data=lineOne
+bar-chart data=barOne
 
 outlet

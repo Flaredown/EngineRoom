@@ -55,6 +55,7 @@ export default Ember.Component.extend(Chart, {
     var plotWidth = this.get("chartDivWidth") - margin.left - margin.right,
         plotHeight = this.get("chartDivHeight") - margin.top - margin.bottom;
 
+    // TODO: put in route?
     var self = this;
     var data = this.get("data").processed.map(function(d) {
       d.date = self.get("formatDateKeen").parse(d.timeframe.start);

@@ -56,6 +56,11 @@ export default Ember.Route.extend(HistogramMixin, {
           specs: specs,
           processed: query.result
         };
+      } else if (specs.chartType === "bar"){
+        return {
+          specs: specs,
+          processed: query.result
+        };
       } else {
         throw "Unexpected chartType!";
       }
