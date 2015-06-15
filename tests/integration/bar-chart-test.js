@@ -7,7 +7,7 @@ moduleForComponent("bar-chart", "BarChartComponent", {
   setup: function() {
     var fixture = barChartFixture();
 
-    this.subject().set("data", fixture);
+    this.subject().set("data", fixture.small);
   },
   tearDown: function() {
     //
@@ -82,14 +82,15 @@ test("it draws as many bars as groups for a small dataset", function() {
   equal(bars.length, expected_n_bars);
 });
 
-// test("it draws a maximum number of bars for a large dataset", function() {
-//   var component = this.subject();  
-//   this.render();
+test("it draws a maximum number of bars for a large dataset", function() {
+  var fixture = barChartFixture();
+  this.subject().set("data", fixture.large);
 
-//   var svg = component.$().find("svg");
-//   var bars = svg.find(".bar");
+  var component = this.subject();
+  this.render();
 
-//   var maxBars = 12;  // from fixture
+  var svg = component.$().find("svg");
+  var bars = svg.find(".bar");
 
-//   equal(bars.length, expected_n_bars);
-// });
+  equal(bars.length, component.get("maxBars"));
+});

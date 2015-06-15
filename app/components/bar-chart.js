@@ -47,7 +47,8 @@ export default Ember.Component.extend(Chart, {
 
     this.set("chartDivHeight", 250);
     this.set("xAxisRoom", 13);
-    this.set("yAxisRoom", 25);
+    this.set("yAxisRoom", 78);
+    this.set("maxBars", 12);
 
     var color = d3.scale.ordinal()
       .range(this.get("colorPalette"));
@@ -61,7 +62,6 @@ export default Ember.Component.extend(Chart, {
         plotHeight = this.get("chartDivHeight") - margin.top - margin.bottom;
 
     var groupBy = this.get("groupBy");
-    var maxBars = 12;
 
     // TODO: this should go in route
     var data = this.get("data").processed.sort(
@@ -76,7 +76,7 @@ export default Ember.Component.extend(Chart, {
         return 0;
       })
         .filter(function(value) { return value[groupBy] !== null; })
-        .slice(0, maxBars);
+        .slice(0, this.get("maxBars"));
 
     var x = d3.scale.linear()
         .domain([0, d3.max(data, function(d) { return d.result; })])
