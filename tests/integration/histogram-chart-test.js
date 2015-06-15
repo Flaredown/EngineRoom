@@ -1,5 +1,5 @@
-import { moduleForComponent, test } from 'ember-qunit';
-import histogramChartFixture from '../fixtures/histogram-chart-fixture';
+import { moduleForComponent, test } from "ember-qunit";
+import histogramChartFixture from "../fixtures/histogram-chart-fixture";
 
 
 moduleForComponent("histogram-chart", "HistogramChartComponent", {

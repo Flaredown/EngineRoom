@@ -1,5 +1,5 @@
-import { moduleForComponent, test } from 'ember-qunit';
-import lineChartFixture from '../fixtures/line-chart-fixture';
+import { moduleForComponent, test } from "ember-qunit";
+import lineChartFixture from "../fixtures/line-chart-fixture";
 
 
 moduleForComponent("line-chart", "LineChartComponent", {
