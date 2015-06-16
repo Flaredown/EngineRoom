@@ -7,9 +7,6 @@ setResolver(resolver);
 
 // TODO: functionality not yet under test
 
-// All charts
-// truncation of axis labels
-
 // Histogram
 // height of bars
 // x-position of bars

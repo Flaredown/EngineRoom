@@ -65,18 +65,6 @@ test("it writes a chart title", function() {
   equal(title.text(), expectedTitle);
 });
 
-test("it draws as many bars as groups for a small dataset", function() {
-  var component = this.subject();  
-  this.render();
-
-  var svg = component.$().find("svg");
-  var bars = svg.find(".bar");
-
-  var expected_n_bars = 7;  // fragile, depends on fixture
-
-  equal(bars.length, expected_n_bars);
-});
-
 test("it truncates long y-axis labels", function() {
   var component = this.subject();  
   this.render();
@@ -92,6 +80,20 @@ test("it truncates long y-axis labels", function() {
   equal(yAxisLabels[0].textContent, expectedTruncation);
 });
 
+test("it draws as many bars as groups for a small dataset", function() {
+  var component = this.subject();  
+  this.render();
+
+  var svg = component.$().find("svg");
+  var bars = svg.find(".bar");
+
+  var expected_n_bars = 7;  // fragile, depends on fixture
+
+  equal(bars.length, expected_n_bars);
+});
+
+// using other fixtures
+
 test("it draws a maximum number of bars for a large dataset", function() {
   var fixture = barChartFixture();
   this.subject().set("data", fixture.large);
@@ -104,4 +106,3 @@ test("it draws a maximum number of bars for a large dataset", function() {
 
   equal(bars.length, component.get("maxBars"));
 });
-

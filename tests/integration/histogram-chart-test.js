@@ -49,22 +49,7 @@ test("it draws as many bars as the maximum value + 1 for a small dataset", funct
   var svg = component.$().find("svg");
   var bars = svg.find(".bar");
 
-  var expected_n_bars = 5;  // from fixture
-
-  equal(bars.length, expected_n_bars);
-});
-
-test("it draws a reasonable number of bars given the chart width for a large dataset", function() {
-  var fixture = histogramChartFixture();
-  this.subject().set("data", fixture.large);
-
-  var component = this.subject();
-  this.render();
-
-  var svg = component.$().find("svg");
-  var bars = svg.find(".bar");
-
-  var expected_n_bars = 45;  // calculated from chart width
+  var expected_n_bars = 5;  // fragile, from fixture
 
   equal(bars.length, expected_n_bars);
 });
@@ -90,4 +75,21 @@ test("it writes a chart title", function() {
   var expectedTitle = component.get("titleString");
 
   equal(title.text(), expectedTitle);
+});
+
+// using other fixtures
+
+test("it draws a reasonable number of bars given the chart width for a large dataset", function() {
+  var fixture = histogramChartFixture();
+  this.subject().set("data", fixture.large);
+
+  var component = this.subject();
+  this.render();
+
+  var svg = component.$().find("svg");
+  var bars = svg.find(".bar");
+
+  var expected_n_bars = 45;  // fragile, calculated from chart width
+
+  equal(bars.length, expected_n_bars);
 });

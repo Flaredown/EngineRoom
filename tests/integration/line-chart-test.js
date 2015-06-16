@@ -42,15 +42,7 @@ test("it sizes the svg based on div size and margin options", function() {
   equal(svg.height(), expectedSvgHeight, "height");
 });
 
-test("it draws a line", function() {
-  var component = this.subject();  
-  this.render();
 
-  var svg = component.$().find("svg");
-  var line = svg.find(".line");
-
-  ok(line);
-});
 
 test("it draws axes", function() {
   var component = this.subject();
@@ -75,3 +67,12 @@ test("it writes a chart title", function() {
   equal(title.text(), expectedTitle);
 });
 
+test("it draws a line", function() {
+  var component = this.subject();  
+  this.render();
+
+  var svg = component.$().find("svg");
+  var line = svg.find(".line");
+
+  ok(line);
+});
