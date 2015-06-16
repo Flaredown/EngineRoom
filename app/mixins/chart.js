@@ -65,10 +65,10 @@ export default Ember.Mixin.create({
     //   .text(function(d) { return d; });
   },
 
-  margin: function(xAxisRoom, yAxisRoom) {
+  margin: function(xAxisRoom, yAxisRoom, legendRoom) {
     return {
       top: MARGIN_BASE,
-      right: MARGIN_BASE,
+      right: MARGIN_BASE + legendRoom,
       bottom: MARGIN_BASE + xAxisRoom,
       left: MARGIN_BASE + yAxisRoom
     };

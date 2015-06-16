@@ -43,6 +43,17 @@ module.exports = function(environment) {
               "targetProperty": "user_id",
               "groupBy": "name"
             }
+          },
+          {
+            "chartType": "stackedArea",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "pageviews",
+              "targetProperty": "session_id",
+              "groupBy": "user_agent.browser.name",
+              "timeframe": "this_28_days",
+              "interval": "daily"
+            }
           }
         ]
       }

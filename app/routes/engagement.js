@@ -45,28 +45,33 @@ export default Ember.Route.extend(HistogramMixin, {
           specs = m[1];
 
       // TODO: case logic ripe for a refactor
-      if (specs.chartType === "histogram"){
-        var process = self.get("processHistogram");
-        return {
-          specs: specs,
-          processed: process(query, specs.queryParams.groupBy)
-        };
-      } else if (specs.chartType === "line"){
-        return {
-          specs: specs,
-          processed: query.result
-        };
-      } else if (specs.chartType === "bar"){
-        return {
-          specs: specs,
-          processed: query.result
-        };
-      } else {
-        throw "Unexpected chartType!";
+      switch (specs.chartType) {
+        case "histogram":
+          var process = self.get("processHistogram");
+          return {
+            specs: specs,
+            processed: process(query, specs.queryParams.groupBy)
+          };
+        case "line":
+          return {
+            specs: specs,
+            processed: query.result
+          };
+        case "bar":
+          return {
+            specs: specs,
+            processed: query.result
+          };
+        case "stackedArea":
+          return {
+            specs: specs,
+            processed: query.result
+          };
+        default:
+          throw "Unexpected chartType!";
       }
     });
-
+    
     controller.set("model", processedModel);
   }
-
 });

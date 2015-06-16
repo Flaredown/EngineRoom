@@ -48,6 +48,7 @@ export default Ember.Component.extend(Chart, {
     this.set("chartDivHeight", 250);
     this.set("xAxisRoom", 13);
     this.set("yAxisRoom", 78);
+    this.set("legendRoom", 0);
     this.set("maxBars", 12);
 
     var color = d3.scale.ordinal()
@@ -55,7 +56,8 @@ export default Ember.Component.extend(Chart, {
 
     var margin = this.get("margin")(
       this.get("xAxisRoom"),
-      this.get("yAxisRoom")
+      this.get("yAxisRoom"),
+      this.get("legendRoom")
     );
 
     var plotWidth = this.get("chartDivWidth") - margin.left - margin.right,
