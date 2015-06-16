@@ -89,5 +89,6 @@ test("it draws a line", function() {
   }
 
   var expectedSegmentCount = component.get("data").processed.length;
+  
   equal(segments.length, expectedSegmentCount, "draws the right number of segments");
 });

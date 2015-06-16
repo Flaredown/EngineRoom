@@ -2,10 +2,9 @@ import Ember from "ember";
 
 var DISPLAY_DATE_FORMAT = "%b %d";
 var FLAREDOWN_COLORS = [
-  "#ECC916", "#F58A5A", "#D15423",
-  "#D47C87", "#C01E55", "#DB9126",
-  "#B83B8A", "#ED80B2", "#F27071",
-  "#F7A8A8"
+  "#B2BE84", "#709CB2", "#ED9E81",
+  "#E7CC89", "#B18DB4", "#74A893",
+  "#DB7B9C", "#F07670"
 ];
 var KEEN_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%LZ";
 var MARGIN_BASE = 12;
