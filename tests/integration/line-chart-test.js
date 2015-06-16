@@ -72,7 +72,22 @@ test("it draws a line", function() {
   this.render();
 
   var svg = component.$().find("svg");
-  var line = svg.find(".line");
+  var line = svg.find(".line")[0];
 
-  ok(line);
+  ok(line, "draws the line");
+
+  var segments = [];
+  for (var i = 0 ; i < line.pathSegList.numberOfItems; i++) {
+    var item = line.pathSegList.getItem(i);
+    switch (item.pathSegType) {
+    case SVGPathSeg.PATHSEG_MOVETO_ABS:
+       segments.push(item.x + " " + item.y);
+       break;
+    case SVGPathSeg.PATHSEG_LINETO_ABS:
+       segments.push(item.x + " " + item.y);
+    }
+  }
+
+  var expectedSegmentCount = component.get("data").processed.length;
+  equal(segments.length, expectedSegmentCount, "draws the right number of segments");
 });

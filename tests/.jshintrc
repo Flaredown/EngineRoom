@@ -38,7 +38,8 @@
     "Ember": false,
     "equal": false,
     "Keen": false,
-    "ok": false
+    "ok": false,
+    "SVGPathSeg": false
   },
   "immed": false,
   "laxbreak": false,
