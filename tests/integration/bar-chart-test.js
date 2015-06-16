@@ -22,18 +22,13 @@ test("it renders", function() {
   equal(component._state, "inDOM");
 });
 
-test("it draws an svg", function() {
-  var component = this.subject();
-  this.render();
-
-  ok(component.$().find("svg"));
-});
-
 test("it sizes the svg based on div size and margin options", function() {
   var component = this.subject();
   this.render();
 
   var svg = component.$().find("svg");
+
+  ok(svg, "draws the svg");
 
   var chartDiv = component.$().find(".chart");
   var margin = component.get("margin")(
