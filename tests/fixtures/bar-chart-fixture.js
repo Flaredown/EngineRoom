@@ -16,7 +16,7 @@ var fixture = function() {
         {"name":"Thing 3","result":1},
         {"name":"Thing 4","result":3},
         {"name":"Thing 5","result":4},
-        {"name":"Thing 6","result":5},
+        {"name":"Thing 6 with a hugely long name","result":5},
         {"name":"Thing 7","result":1}
       ]
     },

@@ -72,9 +72,24 @@ test("it draws as many bars as groups for a small dataset", function() {
   var svg = component.$().find("svg");
   var bars = svg.find(".bar");
 
-  var expected_n_bars = 7;  // from fixture
+  var expected_n_bars = 7;  // fragile, depends on fixture
 
   equal(bars.length, expected_n_bars);
+});
+
+test("it truncates long y-axis labels", function() {
+  var component = this.subject();  
+  this.render();
+
+  var longLabel = component.get("data").processed[0].name;  // fragile, depends on fixture
+
+  var yAxis = component.$().find(".y");
+  var yAxisLabels = yAxis.find("text");
+
+  var magicNumber = 13;  // fragile, depends on component.yAxisRoom and axis label text
+  var expectedTruncation = longLabel.slice(0, magicNumber) + "...";
+
+  equal(yAxisLabels[0].textContent, expectedTruncation);
 });
 
 test("it draws a maximum number of bars for a large dataset", function() {
@@ -89,3 +104,4 @@ test("it draws a maximum number of bars for a large dataset", function() {
 
   equal(bars.length, component.get("maxBars"));
 });
+

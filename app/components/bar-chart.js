@@ -102,7 +102,7 @@ export default Ember.Component.extend(Chart, {
 
     _drawBars(data, this.get("groupBy"), x, y, svg, plotHeight, color);
     this.get("drawXAxis")(xAxis, svg, plotHeight);
-    this.get("drawYAxis")(yAxis, svg);
+    this.get("drawYAxis")(yAxis, svg, this.get("yAxisRoom"));
     this.get("drawTitle")(this.get("titleString"), this.element);
 
     // NEXT: TDD the truncate function

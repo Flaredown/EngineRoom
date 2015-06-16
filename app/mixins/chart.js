@@ -12,6 +12,19 @@ var MARGIN_BASE = 12;
 var PADDING_TOP = 0;
 var PADDING_RIGHT = 10;
 
+function truncate(text, width, padding) {
+  text.each(function() {
+    var self = d3.select(this),
+      textLength = self.node().getComputedTextLength(),
+      text = self.text();
+    while (textLength > (width - 2 * padding) && text.length > 0) {
+      text = text.slice(0, -1);
+      self.text(text + '...');
+      textLength = self.node().getComputedTextLength();
+    }
+  });
+}
+
 
 export default Ember.Mixin.create({
 
@@ -43,10 +56,14 @@ export default Ember.Mixin.create({
       .call(axis);
   },
 
-  drawYAxis: function(axis, target) {
+  drawYAxis: function(axis, target, yAxisRoom) {
     target.append("g")
       .attr("class", "y axis")
-      .call(axis);
+      .call(axis)
+    .selectAll(".tick text")
+      .call(truncate, yAxisRoom, 0);
+    // .append("svg:title")
+    //   .text(function(d) { return d; });
   },
 
   margin: function(xAxisRoom, yAxisRoom) {
@@ -56,6 +73,5 @@ export default Ember.Mixin.create({
       bottom: MARGIN_BASE + xAxisRoom,
       left: MARGIN_BASE + yAxisRoom
     };
-  },
-
+  }
 });
