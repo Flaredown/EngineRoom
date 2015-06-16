@@ -42,7 +42,7 @@ test("it sizes the svg based on div size and margin options", function() {
   equal(svg.height(), expectedSvgHeight, "height");
 });
 
-test("it draws as many bars as the maximum value + 1 for a small dataset", function() {
+test("it draws as many bars as the maximum value in the data + 1 for a small dataset", function() {
   var component = this.subject();  
   this.render();
 
@@ -52,6 +52,19 @@ test("it draws as many bars as the maximum value + 1 for a small dataset", funct
   var expected_n_bars = 5;  // fragile, from fixture
 
   equal(bars.length, expected_n_bars);
+});
+
+test("it draws the bars to the right height", function() {
+  var component = this.subject();  
+  this.render();
+
+  var svg = component.$().find("svg");
+  var bars = svg.find(".bar");
+  var barHeight = parseInt(bars.find("rect").first().attr("height"));
+
+  var expectedBarHeight = 106;  // fragile, depends on fixture and chart height
+
+  equal(barHeight, expectedBarHeight);
 });
 
 test("it draws axes", function() {

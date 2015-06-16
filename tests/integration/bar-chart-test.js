@@ -92,6 +92,19 @@ test("it draws as many bars as groups for a small dataset", function() {
   equal(bars.length, expected_n_bars);
 });
 
+test("it draws the bars to the right width", function() {
+  var component = this.subject();  
+  this.render();
+
+  var svg = component.$().find("svg");
+  var bars = svg.find(".bar");
+  var barWidth = parseInt(bars.find("rect").first().attr("width"));
+
+  var expectedBarWidth = 1154;  // fragile, depends on fixture and chart width
+
+  equal(barWidth, expectedBarWidth);
+});
+
 // using other fixtures
 
 test("it draws a maximum number of bars for a large dataset", function() {
