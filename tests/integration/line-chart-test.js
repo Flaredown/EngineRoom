@@ -71,6 +71,8 @@ test("it draws a line", function() {
   var component = this.subject();  
   this.render();
 
+  var processedData = component.get("data").processed;
+
   var svg = component.$().find("svg");
   var line = svg.find(".line")[0];
 
@@ -81,14 +83,20 @@ test("it draws a line", function() {
     var item = line.pathSegList.getItem(i);
     switch (item.pathSegType) {
     case SVGPathSeg.PATHSEG_MOVETO_ABS:
-       segments.push(item.x + " " + item.y);
+       segments.push({x: item.x, y: item.y});
        break;
     case SVGPathSeg.PATHSEG_LINETO_ABS:
-       segments.push(item.x + " " + item.y);
+       segments.push({x: item.x, y: item.y});
     }
   }
 
-  var expectedSegmentCount = component.get("data").processed.length;
-  
+  var expectedSegmentCount = processedData.length;
   equal(segments.length, expectedSegmentCount, "draws the right number of segments");
+
+  var expectedSegmentX = 460;  // fragile, based on fixture and div width/height
+  var expectedSegmentY = 12;  // fragile, based on fixture and div width/height
+
+  equal(Math.round(segments[5].x), expectedSegmentX, "segments go in the right place: x"); 
+  equal(Math.round(segments[5].y), expectedSegmentY, "segments go in the right place: y"); 
+
 });
