@@ -105,5 +105,6 @@ export default Ember.Component.extend(Chart, {
     this.get("drawYAxis")(yAxis, svg);
     this.get("drawTitle")(this.get("titleString"), this.element);
 
+    // NEXT: TDD the truncate function
   }
 });

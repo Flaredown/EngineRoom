@@ -4,3 +4,21 @@ import {
 } from 'ember-qunit';
 
 setResolver(resolver);
+
+// TODO: functionality not yet under test
+
+// All charts
+// truncation of axis labels
+
+// Histogram
+// height of bars
+// x-position of bars
+// colour of bars
+
+// Line chart
+// shape of line
+// colour of line
+
+// Bar chart
+// length of bars
+// y-position of bars
