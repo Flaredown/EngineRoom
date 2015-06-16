@@ -43,30 +43,28 @@ test("it sizes the svg based on div size and margin options", function() {
   equal(svg.height(), expectedSvgHeight, "height");
 });
 
+test("it draws axes", function() {
+  var component = this.subject();
+  this.render();
 
+  var svg = component.$().find("svg");
+  var xAxis = svg.find(".x");
+  var yAxis = svg.find(".y");
 
-// test("it draws axes", function() {
-//   var component = this.subject();
-//   this.render();
+  ok(xAxis);
+  ok(yAxis);
+});
 
-//   var svg = component.$().find("svg");
-//   var xAxis = svg.find(".x");
-//   var yAxis = svg.find(".y");
+test("it writes a chart title", function() {
+  var component = this.subject();
+  this.render();
 
-//   ok(xAxis);
-//   ok(yAxis);
-// });
+  var title = component.$().find(".chart-title");
 
-// test("it writes a chart title", function() {
-//   var component = this.subject();
-//   this.render();
+  var expectedTitle = component.get("titleString");
 
-//   var title = component.$().find(".chart-title");
-
-//   var expectedTitle = component.get("titleString");
-
-//   equal(title.text(), expectedTitle);
-// });
+  equal(title.text(), expectedTitle);
+});
 
 // test("it draws a line", function() {
 //   var component = this.subject();  

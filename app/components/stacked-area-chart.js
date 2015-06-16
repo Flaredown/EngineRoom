@@ -27,6 +27,10 @@ export default Ember.Component.extend(Chart, {
     return "#" + this.get("elementId") + " .chart";
   }),
 
+  groupBy: computed("data", function() {
+    return this.get("data").specs.queryParams.groupBy;
+  }),
+
   titleString: computed("data", function() {
   var spec = this.get("data").specs;
   return spec.queryType +
@@ -59,41 +63,82 @@ export default Ember.Component.extend(Chart, {
     var plotWidth = this.get("chartDivWidth") - margin.left - margin.right,
         plotHeight = this.get("chartDivHeight") - margin.top - margin.bottom;
 
-    // // TODO: put in route?
-    // var self = this;
-    // var data = this.get("data").processed.map(function(d) {
-    //   d.date = self.get("formatDateKeen").parse(d.timeframe.start);
-    //   return d;
-    // });
+    var data = this.get("data").processed;
 
-    // var x = d3.time.scale()
-    //   .domain(d3.extent(data, function(d) { return d.date; }))
-    //   .range([0, plotWidth - this.get("paddingRight")]);
+    var groupBy = this.get("groupBy");
 
-    // var y = d3.scale.linear()
-    //   .domain([0, d3.max(data, function(d) { return d.value; })])
-    //   .range([plotHeight, 0 + this.get("paddingTop")]);
+    var groups = data[0].value.map(function(x) {
+      return x[groupBy];
+    });
 
-    // var xAxis = d3.svg.axis()
-    //   .scale(x)
-    //   .orient("bottom")
-    //   //.ticks(n_days)
-    //   .tickFormat(this.get("formatDateDisplay"))
-    //   .tickSubdivide(0);
+    color.domain(groups);
 
-    // var yAxis = d3.svg.axis()
-    //   .scale(y)
-    //   .orient("left")
-    //   .ticks(4)
-    //   .tickFormat(this.get("formatCount"))
-    //   .tickSubdivide(0);
+
+    // TODO put in route?
+    var self = this;
+    data.forEach(function(d) {
+      d.date = self.get("formatDateKeen").parse(d.timeframe.start);
+      d.total = d.value
+        .map(function(x) { return x.result; })
+        .reduce(function(previousValue, currentValue, index, array) {
+          return previousValue + currentValue;
+        });
+    });
+    
+    // var stack = d3.layout.stack()
+    //   .values(function(d) { return d.values; });
+
+    // var grouped = stack(color.domain().map(function(name) {
+    //   return {
+    //     groupBy: name,
+    //     values: data.map(function(d) {
+    //       return {date: d.date, y: d.value[groups.indexOf(name)].result};
+    //     })
+    //   };
+    // }));
+
+    var x = d3.time.scale()
+      .domain(d3.extent(data, function(d) { return d.date; }))
+      .range([0, plotWidth]);
+
+    var y = d3.scale.linear()
+      .domain([0, d3.max(data, function(d) { return d.total; })])
+      .range([plotHeight, 0]);
+
+    // var area = d3.svg.area()
+    //   .x(function(d) { return x(d.date); })
+    //   .y0(function(d) { return y(d.y0); })
+    //   .y1(function(d) { return y(d.y0 + d.y); });
+
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom")
+      //.ticks(n_days)
+      .tickFormat(this.get("formatDateDisplay"))
+      .tickSubdivide(0);
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left")
+      .ticks(4)
+      .tickFormat(this.get("formatCount"))
+      .tickSubdivide(0);
 
     var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, margin);
 
-    // _drawLine(data, x, y, svg, color());
-    // this.get("drawXAxis")(xAxis, svg, plotHeight);
-    // this.get("drawYAxis")(yAxis, svg, this.get("yAxisRoom"));
-    // this.get("drawTitle")(this.get("titleString"), this.element);
+    // var group = svg.selectAll(".group")
+    //   .data(grouped)
+    // .enter().append("g")
+    //   .attr("class", "group");
+
+    // group.append("path")
+    //   .attr("class", "area")
+    //   .attr("d", function(d) { return area(d.values); })
+    //   .style("fill", function(d) { return color(d.groupBy); });
+
+    this.get("drawXAxis")(xAxis, svg, plotHeight);
+    this.get("drawYAxis")(yAxis, svg, this.get("yAxisRoom"));
+    this.get("drawTitle")(this.get("titleString"), this.element);
 
   }
 });
