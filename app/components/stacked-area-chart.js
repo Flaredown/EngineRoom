@@ -73,7 +73,6 @@ export default Ember.Component.extend(Chart, {
 
     color.domain(groups);
 
-
     // TODO put in route?
     var self = this;
     data.forEach(function(d) {
@@ -84,7 +83,7 @@ export default Ember.Component.extend(Chart, {
           return previousValue + currentValue;
         });
     });
-    
+
     // var stack = d3.layout.stack()
     //   .values(function(d) { return d.values; });
 
@@ -139,6 +138,40 @@ export default Ember.Component.extend(Chart, {
     this.get("drawXAxis")(xAxis, svg, plotHeight);
     this.get("drawYAxis")(yAxis, svg, this.get("yAxisRoom"));
     this.get("drawTitle")(this.get("titleString"), this.element);
+
+    // var legend = svg.selectAll('.legend')
+    //   .data(grouped)
+    //   .enter()
+    //   .append('g')
+    //   .attr('class', 'legend')
+    //   .attr('transform', function(d, i) {
+    //     var legendEntryHeight = legendRectSize + legendSpacing;
+    //     //var offset = legendEntryHeight * groups.length
+    //     var offset = 0;
+    //     var horz = width + 10;
+    //     var vert = i * legendEntryHeight - offset;
+    //     return 'translate(' + horz + ',' + vert + ')';
+    //   });
+
+    // legend.append('rect')
+    //   .attr('width', legendRectSize)
+    //   .attr('height', legendRectSize)
+    //   .style('fill', function(d) { 
+    //     return color(d.groupBy);
+    //   })
+    //   .style('stroke', function(d) { 
+    //     return color(d.groupBy);
+    //   });
+
+    // legend.append('text')
+    //   .attr('x', legendRectSize + legendSpacing)
+    //   .attr('y', legendRectSize - legendSpacing)
+    //   .text(function(d) { return d.groupBy; });
+
+    // legend.selectAll('text')
+    //   .call(truncate, legendRoom - legendRectSize - legendSpacing, 0)
+    // .append("svg:title")
+    //   .text(function(d) { return d.groupBy; });
 
   }
 });
