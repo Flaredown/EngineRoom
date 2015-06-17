@@ -20,3 +20,4 @@ setResolver(resolver);
 // Stacked area chart
 // shape of each group
 // colour of path fills
+// legend: check for rects, labels, truncation

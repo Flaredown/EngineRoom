@@ -36,7 +36,8 @@ test("it sizes the svg based on div size and margin options", function() {
     component.get("yAxisRoom"),
     component.get("legendRoom")
   );
-  var expectedSvgWidth = chartDiv.width() - margin.right;
+  var expectedSvgWidth = chartDiv.width();
+  //var expectedSvgWidth = chartDiv.width() - margin.right;
   var expectedSvgHeight = component.get("chartDivHeight");
 
   equal(svg.width(), expectedSvgWidth, "width");
@@ -83,5 +84,20 @@ test("it draws stacked areas", function() {
   equal(path.length, expectedGroupN, "right number of paths");
 
   // TODO: test properties of the paths themselves?
+});
+
+test("it draws a legend", function() {
+  var component = this.subject();  
+  this.render();
+
+  var processedData = component.get("data").processed;
+
+  var svg = component.$().find("svg");
+  var legendEntries = svg.find(".legend");
+
+  var expectedLegendEntryN = processedData.length;
+  equal(legendEntries.length, expectedLegendEntryN);
+
+  // TODO: check for rects, labels, truncation
 
 });

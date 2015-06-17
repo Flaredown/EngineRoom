@@ -38,7 +38,7 @@ export default Ember.Mixin.create({
     // violates command-query separation by having side effects and returning value
 
     return d3.select(element).append("svg")
-        .attr("width", width + margin.left)
+        .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");  
