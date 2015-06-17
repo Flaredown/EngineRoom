@@ -2,19 +2,17 @@ import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
 
-function _drawLine(data, xScale, yScale, target, color) {
+function _drawGroups(data, areaFunction, target, color) {
 
-  var line = d3.svg.line()
-    .x(function(d) { return xScale(d.date); })
-    .y(function(d) { return yScale(d.value); });
+  var group = target.selectAll(".group")
+    .data(data)
+  .enter().append("g")
+    .attr("class", "group");
 
-  target.append("path")
-    .datum(data)
-    .attr("class", "line")
-    .style("stroke", color)
-    .style("stroke-width", 2) // TODO handle in css?
-    .style("fill", "none")
-    .attr("d", line);
+  group.append("path")
+    .attr("class", "area")
+    .attr("d", function(d) { return areaFunction(d.values); })
+    .style("fill", function(d) { return color(d.groupBy); });
 }
 
 export default Ember.Component.extend(Chart, {
@@ -79,22 +77,10 @@ export default Ember.Component.extend(Chart, {
       d.date = self.get("formatDateKeen").parse(d.timeframe.start);
       d.total = d.value
         .map(function(x) { return x.result; })
-        .reduce(function(previousValue, currentValue, index, array) {
+        .reduce(function(previousValue, currentValue) {
           return previousValue + currentValue;
         });
     });
-
-    // var stack = d3.layout.stack()
-    //   .values(function(d) { return d.values; });
-
-    // var grouped = stack(color.domain().map(function(name) {
-    //   return {
-    //     groupBy: name,
-    //     values: data.map(function(d) {
-    //       return {date: d.date, y: d.value[groups.indexOf(name)].result};
-    //     })
-    //   };
-    // }));
 
     var x = d3.time.scale()
       .domain(d3.extent(data, function(d) { return d.date; }))
@@ -104,10 +90,23 @@ export default Ember.Component.extend(Chart, {
       .domain([0, d3.max(data, function(d) { return d.total; })])
       .range([plotHeight, 0]);
 
-    // var area = d3.svg.area()
-    //   .x(function(d) { return x(d.date); })
-    //   .y0(function(d) { return y(d.y0); })
-    //   .y1(function(d) { return y(d.y0 + d.y); });
+    // TODO what to do with stack, grouped, area?
+    var stack = d3.layout.stack()
+      .values(function(d) { return d.values; });
+
+    var grouped = stack(color.domain().map(function(name) {
+      return {
+        groupBy: name,
+        values: data.map(function(d) {
+          return {date: d.date, y: d.value[groups.indexOf(name)].result};
+        })
+      };
+    }));
+
+    var area = d3.svg.area()
+      .x(function(d) { return x(d.date); })
+      .y0(function(d) { return y(d.y0); })
+      .y1(function(d) { return y(d.y0 + d.y); });
 
     var xAxis = d3.svg.axis()
       .scale(x)
@@ -125,16 +124,7 @@ export default Ember.Component.extend(Chart, {
 
     var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, margin);
 
-    // var group = svg.selectAll(".group")
-    //   .data(grouped)
-    // .enter().append("g")
-    //   .attr("class", "group");
-
-    // group.append("path")
-    //   .attr("class", "area")
-    //   .attr("d", function(d) { return area(d.values); })
-    //   .style("fill", function(d) { return color(d.groupBy); });
-
+    _drawGroups(grouped, area, svg, color);
     this.get("drawXAxis")(xAxis, svg, plotHeight);
     this.get("drawYAxis")(yAxis, svg, this.get("yAxisRoom"));
     this.get("drawTitle")(this.get("titleString"), this.element);

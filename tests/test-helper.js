@@ -16,3 +16,7 @@ setResolver(resolver);
 
 // Bar chart
 // y-position of bars
+
+// Stacked area chart
+// shape of each group
+// colour of path fills
