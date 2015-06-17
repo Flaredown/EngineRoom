@@ -43,27 +43,22 @@ export default Ember.Component.extend(Chart, {
     " by " + spec.queryParams.groupBy;
   }),
 
-  didInsertElement(){
-
+  willInsertElement(){
     this.set("chartDivHeight", 250);
     this.set("xAxisRoom", 13);
     this.set("yAxisRoom", 20);
     this.set("legendRoom", 0);
+  },
+
+  didInsertElement(){
 
     var color = d3.scale.ordinal()
       .range(this.get("colorPalette"));
     
     var maxValue = Math.max.apply(null, this.get("data").processed);
 
-    var margin = this.get("margin")(
-      this.get("xAxisRoom"),
-      this.get("yAxisRoom"),
-      this.get("legendRoom")
-    );
-
-
-    var plotWidth = this.get("chartDivWidth") - margin.left - margin.right,
-        plotHeight = this.get("chartDivHeight") - margin.top - margin.bottom;
+    var plotWidth = this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right,
+        plotHeight = this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
 
     var nBins = _nBins(maxValue, plotWidth);
 
@@ -91,7 +86,7 @@ export default Ember.Component.extend(Chart, {
         .tickFormat(this.get("formatCount"))
         .tickSubdivide(0);
 
-    var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, margin);
+    var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, this.get("margin"));
     _drawBars(data, x, y, svg, plotHeight, color);
     this.get("drawXAxis")(xAxis, svg, plotHeight);
     this.get("drawYAxis")(yAxis, svg, this.get("yAxisRoom"));

@@ -31,11 +31,7 @@ test("it sizes the svg based on div size and margin options", function() {
   ok(svg, "draws the svg");
 
   var chartDiv = component.$().find(".chart");
-  var margin = component.get("margin")(
-    component.get("xAxisRoom"),
-    component.get("yAxisRoom"),
-    component.get("legendRoom")
-  );
+
   var expectedSvgWidth = chartDiv.width();
   //var expectedSvgWidth = chartDiv.width() - margin.right;
   var expectedSvgHeight = component.get("chartDivHeight");

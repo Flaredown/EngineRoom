@@ -38,25 +38,20 @@ export default Ember.Component.extend(Chart, {
     " over " + spec.queryParams.timeframe;
   }),
 
-  didInsertElement(){
-
+  willInsertElement(){
     this.set("chartDivHeight", 250);
     this.set("xAxisRoom", 13);
     this.set("yAxisRoom", 25);
     this.set("legendRoom", 0);
+  },
+
+  didInsertElement(){
 
     var color = d3.scale.ordinal()
       .range(this.get("colorPalette"));
 
-     var margin = this.get("margin")(
-      this.get("xAxisRoom"),
-      this.get("yAxisRoom"),
-      this.get("legendRoom")
-    );
-
-
-    var plotWidth = this.get("chartDivWidth") - margin.left - margin.right,
-        plotHeight = this.get("chartDivHeight") - margin.top - margin.bottom;
+    var plotWidth = this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right,
+        plotHeight = this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
 
     // TODO: put in route?
     var self = this;
@@ -87,7 +82,7 @@ export default Ember.Component.extend(Chart, {
       .tickFormat(this.get("formatCount"))
       .tickSubdivide(0);
 
-    var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, margin);
+    var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, this.get("margin"));
 
     _drawLine(data, x, y, svg, color());
     this.get("drawXAxis")(xAxis, svg, plotHeight);

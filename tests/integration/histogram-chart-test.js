@@ -2,7 +2,7 @@ import { moduleForComponent, test } from "ember-qunit";
 import histogramChartFixture from "../fixtures/histogram-chart-fixture";
 
 
-moduleForComponent("histogram-chart", "HistogramChartComponent", {
+moduleForComponent("histogram-chart", "HistogramChartComponent Integration", {
   needs: [],
   setup: function() {
     var fixture = histogramChartFixture();
@@ -31,11 +31,7 @@ test("it sizes the svg based on div size and margin options", function() {
   ok(svg, "draws the svg");
 
   var chartDiv = component.$().find(".chart");
-  var margin = component.get("margin")(
-    component.get("xAxisRoom"),
-    component.get("yAxisRoom"),
-    component.get("legendRoom")
-  );
+
   var expectedSvgWidth = chartDiv.width();
   var expectedSvgHeight = component.get("chartDivHeight");
 
