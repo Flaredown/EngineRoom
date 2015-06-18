@@ -89,6 +89,16 @@ export default Ember.Component.extend(Chart, {
       .range([this.get("plotHeight"), 0 + this.get("paddingTop")]);
   }),
 
+  setupD3: function() {
+    this.didSetupD3();
+    this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
+    this.barEnter();
+    this.drawXAxis(this.get("xAxis"), this.get("svg"), this.get("plotHeight"));
+    this.drawYAxis(this.get("yAxis"), this.get("svg"), this.get("yAxisRoom"));
+    this.set("D3IsSetUp", true);
+  
+  },
+
   drawD3Elements: function() {
     this.barUpdate();
 
@@ -101,36 +111,18 @@ export default Ember.Component.extend(Chart, {
     this.drawTitle(this.get("titleString"), this.get("element"));
   },
 
-  // drawD3Elements: function() {
-  //   this.didSetupD3();
-  //   var svg = this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
-  //   this.set("D3IsSetUp", true);
-
-  //   _drawBars(this.get("binnedData"), this.get("xScale"), this.get("yScale"), this.get("svg"), this.get("plotHeight"), this.get("colorScale"));
-  //   this.drawXAxis(this.get("xAxis"), this.get("svg"), this.get("plotHeight"));
-  //   this.drawYAxis(this.get("yAxis"), this.get("svg"), this.get("yAxisRoom"));
-  //   this.drawTitle(this.get("titleString"), this.get("element"));
-  // },
-
-  setupD3: function() {
-    this.didSetupD3();
-    this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
-    this.barEnter();
-    this.drawXAxis(this.get("xAxis"), this.get("svg"), this.get("plotHeight"));
-    this.drawYAxis(this.get("yAxis"), this.get("svg"), this.get("yAxisRoom"));
-    this.set("D3IsSetUp", true);
-  
-  },
-
   barSelect: function() {
+    // this returns the update selection
     return this.get("svg").selectAll(".bar").data(this.get("binnedData"));
   },
 
   barEnter: function() {
 
-    // draw anything in the enter selection
-    this.get("svg").selectAll("rect.bar").data(this.get("binnedData")).enter()
-      .append("rect")
+    var enterSelection = this.get("svg").selectAll("rect.bar")
+      .data(this.get("binnedData"))
+      .enter();
+
+    enterSelection.append("rect")
         .attr("class", "bar")
         .style("fill", (d) => { return this.get("colorScale")(d[0]); })
         .attr("transform", (d) => {
@@ -144,10 +136,9 @@ export default Ember.Component.extend(Chart, {
   barUpdate: function() {
     this.barEnter();
 
-    var selection = this.barSelect();
+    var updateSelection = this.barSelect();
 
-    // redraw all elements in the update selection
-    selection.style("fill", (d) => { return this.get("colorScale")(d[0]); })
+    updateSelection.style("fill", (d) => { return this.get("colorScale")(d[0]); })
       .attr("transform", (d) => {
         return "translate(" + this.get("xScale")(d.x) + ", " + this.get("yScale")(d.y) + ")";
       })
@@ -155,7 +146,8 @@ export default Ember.Component.extend(Chart, {
       .attr("width", (d) => { return this.get("xScale")(d.dx) - 1; })
       .attr("height", (d) => { return this.get("plotHeight") - this.get("yScale")(d.y); });
 
-    selection.exit().remove();
+    var exitSelection = updateSelection.exit();
+    exitSelection.remove();
   },
 
   willInsertElement(){
