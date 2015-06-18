@@ -1,29 +1,27 @@
 import { moduleForComponent, test } from "ember-qunit";
 import histogramChartFixture from "../fixtures/histogram-chart-fixture";
 
+let component;
 
 moduleForComponent("histogram-chart", "HistogramChartComponent Integration", {
   needs: [],
   setup: function() {
-    var fixture = histogramChartFixture();
-
-    this.subject().set("data", fixture.small);
+    component = this.subject(
+      {data: histogramChartFixture().small}
+    );
   },
-  tearDown: function() {
+  teardown: function() {
     //
   }
 });
 
 test("it renders", function() {
-  var component = this.subject();
   equal(component._state, "preRender");
   this.render();
-
   equal(component._state, "inDOM");
 });
 
 test("it sizes the svg based on div size and margin options", function() {
-  var component = this.subject();
   this.render();
 
   var svg = component.$().find("svg");
@@ -40,7 +38,6 @@ test("it sizes the svg based on div size and margin options", function() {
 });
 
 test("it draws as many bars as the maximum value in the data + 1 for a small dataset", function() {
-  var component = this.subject();  
   this.render();
 
   var svg = component.$().find("svg");
@@ -52,7 +49,6 @@ test("it draws as many bars as the maximum value in the data + 1 for a small dat
 });
 
 test("it draws the bars to the right height", function() {
-  var component = this.subject();  
   this.render();
 
   var svg = component.$().find("svg");
@@ -65,7 +61,6 @@ test("it draws the bars to the right height", function() {
 });
 
 test("it draws axes", function() {
-  var component = this.subject();
   this.render();
 
   var svg = component.$().find("svg");
@@ -77,7 +72,6 @@ test("it draws axes", function() {
 });
 
 test("it writes a chart title", function() {
-  var component = this.subject();
   this.render();
 
   var title = component.$().find(".chart-title");
@@ -90,16 +84,15 @@ test("it writes a chart title", function() {
 // using other fixtures
 
 test("it draws a reasonable number of bars given the chart width for a large dataset", function() {
-  var fixture = histogramChartFixture();
-  this.subject().set("data", fixture.large);
-
-  var component = this.subject();
   this.render();
+  component.set("data", histogramChartFixture().large);
 
-  var svg = component.$().find("svg");
-  var bars = svg.find(".bar");
+  Ember.run.next(function() {
+    var svg = component.$().find("svg");
+    var bars = svg.find(".bar");
 
-  var expected_n_bars = 45;  // fragile, calculated from chart width
-
-  equal(bars.length, expected_n_bars);
+    var expected_n_bars = 45;  // fragile, calculated from chart width
+    equal(bars.length, expected_n_bars);
+  });
+  
 });

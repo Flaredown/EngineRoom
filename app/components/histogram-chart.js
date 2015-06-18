@@ -1,9 +1,10 @@
 import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
+var observer = Em.observer;
 
 function _drawBars(data, xScale, yScale, target, height, colorScale) {
-
+  console.log(target);
   var bar = target.selectAll(".bar")
       .data(data)
       .enter()
@@ -18,15 +19,32 @@ function _drawBars(data, xScale, yScale, target, height, colorScale) {
       .attr("x", 1)
       .attr("width", function(d) { return xScale(d.dx) - 1; })
       .attr("height", function(d) { return height - yScale(d.y); });
-
 }
 
-function _nBins(maxValue, width) {
-  return Math.min(maxValue + 1, width / 20);
-}
+// TODO change all this.get("function") where it's not a computed property to this.function (in other files)
 
 export default Ember.Component.extend(Chart, {
+  D3IsSetUp: false,
+  dataChanged: observer("data", function() {
+    console.log(this.get("data"));
+    // if (this.get("D3IsSetUp")) {
+    //   this.drawD3Elements();
+    // } else {
+    //   Ember.run(() => { 
+    //     this.setupD3();
+    //     // this.drawD3Elements();
+    //   });
+    // }
+    this.setupD3();
+  }).on("didInsertElement"),
 
+  binnedData: computed("data", "nBins", "xScale", function() {
+    return d3.layout.histogram()
+      .bins(this.get("xScale").ticks(this.get("nBins")))
+      (this.get("data.processed"));
+  }),
+
+  // TODO make this a for real computed property -- propertyDidChange("chartDivWidth")
   chartDivWidth: computed("chartElement", function() {
     return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
   }),
@@ -35,63 +53,86 @@ export default Ember.Component.extend(Chart, {
     return "#" + this.get("elementId") + " .chart";
   }),
 
-  titleString: computed("data", function() {
-  var spec = this.get("data").specs;
-  return spec.queryType +
-    " " + spec.queryParams.targetProperty +
-    " in " + spec.queryParams.eventCollection +
-    " by " + spec.queryParams.groupBy;
+  colorScale: computed("colorPalette", function() {
+    return d3.scale.ordinal().range(this.get("colorPalette"));
   }),
+
+  maxValue: computed("data", function() {
+    return Math.max.apply(null, this.get("data").processed);
+  }),
+
+  nBins: computed("", function() {
+    return Math.min(this.get("maxValue") + 1, this.get("plotWidth") / 20);
+  }),
+
+  plotWidth: computed("chartDivWidth", "margin", function(){
+    return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
+  }),
+
+  plotHeight: computed("chartDivHeight", "margin", function(){
+    return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
+  }),
+
+  titleString: computed("data", function() {
+    var spec = this.get("data").specs;
+    return spec.queryType +
+      " " + spec.queryParams.targetProperty +
+      " in " + spec.queryParams.eventCollection +
+      " by " + spec.queryParams.groupBy;
+  }),
+
+  xAxis: computed("nBins", "xScale", function() {
+    return d3.svg.axis()
+      .scale(this.get("xScale"))
+      .orient("bottom")
+      .ticks(this.get("nBins"));
+  }),
+
+  xScale: computed("maxValue", "paddingRight", "plotWidth", function() {
+    return d3.scale.linear()
+      .domain([0, this.get("maxValue") + 1])
+      .range([0, this.get("plotWidth") - this.get("paddingRight")]);
+  }),
+
+  yAxis: computed("formatCount", "yScale", function(){
+    return d3.svg.axis()
+      .scale(this.get("yScale"))
+      .orient("left")
+      .ticks(4)
+      .tickFormat(this.get("formatCount"))
+      .tickSubdivide(0);  
+  }),
+
+  yScale: computed("binnedData", "paddingTop", "plotHeight", function() {
+    return d3.scale.linear()
+      .domain([0, d3.max(this.get("binnedData"), function(d) { return d.y; })])
+      .range([this.get("plotHeight"), 0 + this.get("paddingTop")]);
+  }),
+
+  // TODO a lot of these params could become computed properties
+  drawD3Elements: function() {
+    _drawBars(this.get("binnedData"), this.get("xScale"), this.get("yScale"), this.get("svg"), this.get("plotHeight"), this.get("colorScale"));
+    this.drawXAxis(this.get("xAxis"), this.get("svg"), this.get("plotHeight"));
+    this.drawYAxis(this.get("yAxis"), this.get("svg"), this.get("yAxisRoom"));
+    this.drawTitle(this.get("titleString"), this.get("element"));
+  },
+
+  setupD3: function() {
+    this.didSetupD3();
+    var svg = this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
+    _drawBars(this.get("binnedData"), this.get("xScale"), this.get("yScale"), svg, this.get("plotHeight"), this.get("colorScale"));
+    this.drawXAxis(this.get("xAxis"), svg, this.get("plotHeight"));
+    this.drawYAxis(this.get("yAxis"), svg, this.get("yAxisRoom"));
+    this.drawTitle(this.get("titleString"), this.get("element"));
+    // Ember.run.scheduleOnce("afterRender", this, "didSetupD3");
+    this.set("D3IsSetUp", true);
+  },
 
   willInsertElement(){
     this.set("chartDivHeight", 250);
     this.set("xAxisRoom", 13);
     this.set("yAxisRoom", 20);
     this.set("legendRoom", 0);
-  },
-
-  didInsertElement(){
-
-    var color = d3.scale.ordinal()
-      .range(this.get("colorPalette"));
-    
-    var maxValue = Math.max.apply(null, this.get("data").processed);
-
-    var plotWidth = this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right,
-        plotHeight = this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
-
-    var nBins = _nBins(maxValue, plotWidth);
-
-    var x = d3.scale.linear()
-        .domain([0, maxValue + 1])
-        .range([0, plotWidth - this.get("paddingRight")]);
-
-    var data = d3.layout.histogram()
-        .bins(x.ticks(nBins))
-        (this.get("data").processed);
-
-    var y = d3.scale.linear()
-        .domain([0, d3.max(data, function(d) { return d.y; })])
-        .range([plotHeight, 0 + this.get("paddingTop")]);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .ticks(nBins);
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .ticks(4)
-        .tickFormat(this.get("formatCount"))
-        .tickSubdivide(0);
-
-    var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, this.get("margin"));
-    _drawBars(data, x, y, svg, plotHeight, color);
-    this.get("drawXAxis")(xAxis, svg, plotHeight);
-    this.get("drawYAxis")(yAxis, svg, this.get("yAxisRoom"));
-    this.get("drawTitle")(this.get("titleString"), this.element);
-
   }
 
 });

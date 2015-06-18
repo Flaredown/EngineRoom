@@ -73,5 +73,25 @@ export default Ember.Route.extend(HistogramMixin, {
     });
     
     controller.set("model", processedModel);
+
+    // Ember.run.later(function() {
+    //   var newModel = [
+    //     {
+    //       specs: {
+    //         "chartType": "histogram",
+    //         "queryType": "count_unique",
+    //         "queryParams": {
+    //           "eventCollection": "entries",
+    //           "targetProperty": "user_id",
+    //           "groupBy": "n_conditions"
+    //         },
+    //       },
+    //       processed: [0, 1, 1, 3, 3, 4]
+    //     }
+    //   ];
+
+    //   controller.set("model", newModel);
+
+    // }, 2000);
   }
 });

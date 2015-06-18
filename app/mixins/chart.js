@@ -29,12 +29,19 @@ function truncate(text, width, padding) {
 
 export default Ember.Mixin.create({
 
-  propertiesOk: observer(function() {
+  initialPropertiesOk: observer(function() {
     Ember.assert("must have chartDivHeight", Ember.isPresent(this.get("chartDivHeight")));
+    Ember.assert("must have legendRoom", Ember.isPresent(this.get("legendRoom")));
     Ember.assert("must have xAxisRoom", Ember.isPresent(this.get("xAxisRoom")));
     Ember.assert("must have yAxisRoom", Ember.isPresent(this.get("yAxisRoom")));
-    Ember.assert("must have legendRoom", Ember.isPresent(this.get("legendRoom")));
   }).on("didInsertElement"),
+
+  didSetupD3: observer(function() {
+    Ember.assert("must have element", Ember.isPresent(this.get("element")));
+    Ember.assert("must have margin", Ember.isPresent(this.get("margin")));
+    Ember.assert("must have plotHeight", Ember.isPresent(this.get("plotHeight")));
+    Ember.assert("must have plotWidth", Ember.isPresent(this.get("plotWidth")));
+  }),
 
   colorPalette: FLAREDOWN_COLORS,
   formatCount: d3.format("d"),
@@ -52,14 +59,16 @@ export default Ember.Mixin.create({
     };
   }),
 
-  drawSvg: function(element, width, height, margin) {
-    // violates command-query separation by having side effects and returning value
+  // svg: computed("element", function() {
+  //   return d3.select(this.get("element")).select("svg");
+  // }),
 
-    return d3.select(element).append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+  drawSvg: function(chartElement, plotWidth, plotHeight, margin) {
+    return d3.select(chartElement).append("svg")
+        .attr("width", plotWidth + margin.left + margin.right)
+        .attr("height", plotHeight + margin.top + margin.bottom)
       .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");  
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");     
   },
 
   drawTitle: function(titleString, element) {
