@@ -59,12 +59,13 @@ export default Ember.Mixin.create({
     };
   }),
 
-  // svg: computed("element", function() {
-  //   return d3.select(this.get("element")).select("svg");
-  // }),
+  svg: computed(function() {
+    // BEWARE, d3 sets stuff on .select (don't watch for "element")
+    return d3.select(this.get("element")).select("svg g");
+  }),
 
   drawSvg: function(chartElement, plotWidth, plotHeight, margin) {
-    return d3.select(chartElement).append("svg")
+    d3.select(chartElement).append("svg")
         .attr("width", plotWidth + margin.left + margin.right)
         .attr("height", plotHeight + margin.top + margin.bottom)
       .append("g")
@@ -91,5 +92,4 @@ export default Ember.Mixin.create({
     // .append("svg:title")
     //   .text(function(d) { return d; });
   }
-
 });

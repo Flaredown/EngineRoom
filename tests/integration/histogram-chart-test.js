@@ -16,7 +16,7 @@ moduleForComponent("histogram-chart", "HistogramChartComponent Integration", {
 });
 
 test("it renders", function() {
-  equal(component._state, "preRender");
+  //equal(component._state, "preRender");
   this.render();
   equal(component._state, "inDOM");
 });
@@ -85,14 +85,16 @@ test("it writes a chart title", function() {
 
 test("it draws a reasonable number of bars given the chart width for a large dataset", function() {
   this.render();
-  component.set("data", histogramChartFixture().large);
-
-  Ember.run.next(function() {
-    var svg = component.$().find("svg");
-    var bars = svg.find(".bar");
-
-    var expected_n_bars = 45;  // fragile, calculated from chart width
-    equal(bars.length, expected_n_bars);
+  Ember.run(function() {
+    component.set("data", histogramChartFixture().large);
   });
+
+  var svg = component.$().find("svg");
+  var bars = svg.find(".bar");
+
+  stop();
+  var expected_n_bars = 45;  // fragile, calculated from chart width
+  equal(bars.length, expected_n_bars);
+
   
 });

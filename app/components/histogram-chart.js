@@ -3,39 +3,19 @@ import Chart from "../mixins/chart";
 var computed = Em.computed;
 var observer = Em.observer;
 
-function _drawBars(data, xScale, yScale, target, height, colorScale) {
-  console.log(target);
-  var bar = target.selectAll(".bar")
-      .data(data)
-      .enter()
-    .append("g")
-      .attr("class", "bar")
-      .style("fill", function(d) { return colorScale(d[0]); })
-      .attr("transform", function(d) {
-        return "translate(" + xScale(d.x) + ", " + yScale(d.y) + ")";
-      });
-
-  bar.append("rect")
-      .attr("x", 1)
-      .attr("width", function(d) { return xScale(d.dx) - 1; })
-      .attr("height", function(d) { return height - yScale(d.y); });
-}
-
 // TODO change all this.get("function") where it's not a computed property to this.function (in other files)
 
 export default Ember.Component.extend(Chart, {
   D3IsSetUp: false,
   dataChanged: observer("data", function() {
-    console.log(this.get("data"));
-    // if (this.get("D3IsSetUp")) {
-    //   this.drawD3Elements();
-    // } else {
-    //   Ember.run(() => { 
-    //     this.setupD3();
-    //     // this.drawD3Elements();
-    //   });
-    // }
-    this.setupD3();
+
+    if (this.get("D3IsSetUp")) {
+      this.drawD3Elements();
+    } else {
+      this.setupD3();
+      this.drawD3Elements();
+    }
+    // this.drawD3Elements();
   }).on("didInsertElement"),
 
   binnedData: computed("data", "nBins", "xScale", function() {
@@ -61,7 +41,7 @@ export default Ember.Component.extend(Chart, {
     return Math.max.apply(null, this.get("data").processed);
   }),
 
-  nBins: computed("", function() {
+  nBins: computed("maxValue", "plotWidth", function() {
     return Math.min(this.get("maxValue") + 1, this.get("plotWidth") / 20);
   }),
 
@@ -109,23 +89,73 @@ export default Ember.Component.extend(Chart, {
       .range([this.get("plotHeight"), 0 + this.get("paddingTop")]);
   }),
 
-  // TODO a lot of these params could become computed properties
   drawD3Elements: function() {
-    _drawBars(this.get("binnedData"), this.get("xScale"), this.get("yScale"), this.get("svg"), this.get("plotHeight"), this.get("colorScale"));
-    this.drawXAxis(this.get("xAxis"), this.get("svg"), this.get("plotHeight"));
-    this.drawYAxis(this.get("yAxis"), this.get("svg"), this.get("yAxisRoom"));
+    this.barUpdate();
+
+    this.get("svg").selectAll(".x.axis")
+      .call(this.get("xAxis"));
+
+    this.get("svg").selectAll(".y.axis")
+      .call(this.get("yAxis"));
+
     this.drawTitle(this.get("titleString"), this.get("element"));
   },
 
+  // drawD3Elements: function() {
+  //   this.didSetupD3();
+  //   var svg = this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
+  //   this.set("D3IsSetUp", true);
+
+  //   _drawBars(this.get("binnedData"), this.get("xScale"), this.get("yScale"), this.get("svg"), this.get("plotHeight"), this.get("colorScale"));
+  //   this.drawXAxis(this.get("xAxis"), this.get("svg"), this.get("plotHeight"));
+  //   this.drawYAxis(this.get("yAxis"), this.get("svg"), this.get("yAxisRoom"));
+  //   this.drawTitle(this.get("titleString"), this.get("element"));
+  // },
+
   setupD3: function() {
     this.didSetupD3();
-    var svg = this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
-    _drawBars(this.get("binnedData"), this.get("xScale"), this.get("yScale"), svg, this.get("plotHeight"), this.get("colorScale"));
-    this.drawXAxis(this.get("xAxis"), svg, this.get("plotHeight"));
-    this.drawYAxis(this.get("yAxis"), svg, this.get("yAxisRoom"));
-    this.drawTitle(this.get("titleString"), this.get("element"));
-    // Ember.run.scheduleOnce("afterRender", this, "didSetupD3");
+    this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
+    this.barEnter();
+    this.drawXAxis(this.get("xAxis"), this.get("svg"), this.get("plotHeight"));
+    this.drawYAxis(this.get("yAxis"), this.get("svg"), this.get("yAxisRoom"));
     this.set("D3IsSetUp", true);
+  
+  },
+
+  barSelect: function() {
+    return this.get("svg").selectAll(".bar").data(this.get("binnedData"));
+  },
+
+  barEnter: function() {
+
+    // draw anything in the enter selection
+    this.get("svg").selectAll("rect.bar").data(this.get("binnedData")).enter()
+      .append("rect")
+        .attr("class", "bar")
+        .style("fill", (d) => { return this.get("colorScale")(d[0]); })
+        .attr("transform", (d) => {
+          return "translate(" + this.get("xScale")(d.x) + ", " + this.get("yScale")(d.y) + ")";
+        })
+        .attr("x", 1)
+        .attr("width", (d) => { return this.get("xScale")(d.dx) - 1; })
+        .attr("height", (d) => { return this.get("plotHeight") - this.get("yScale")(d.y); });
+  },
+
+  barUpdate: function() {
+    this.barEnter();
+
+    var selection = this.barSelect();
+
+    // redraw all elements in the update selection
+    selection.style("fill", (d) => { return this.get("colorScale")(d[0]); })
+      .attr("transform", (d) => {
+        return "translate(" + this.get("xScale")(d.x) + ", " + this.get("yScale")(d.y) + ")";
+      })
+      .attr("x", 1)
+      .attr("width", (d) => { return this.get("xScale")(d.dx) - 1; })
+      .attr("height", (d) => { return this.get("plotHeight") - this.get("yScale")(d.y); });
+
+    selection.exit().remove();
   },
 
   willInsertElement(){
