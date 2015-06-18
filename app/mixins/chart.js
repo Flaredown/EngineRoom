@@ -29,19 +29,29 @@ function truncate(text, width, padding) {
 
 export default Ember.Mixin.create({
 
-  initialPropertiesOk: observer(function() {
+  dataChanged: observer("data", function() {
     Ember.assert("must have chartDivHeight", Ember.isPresent(this.get("chartDivHeight")));
     Ember.assert("must have legendRoom", Ember.isPresent(this.get("legendRoom")));
     Ember.assert("must have xAxisRoom", Ember.isPresent(this.get("xAxisRoom")));
     Ember.assert("must have yAxisRoom", Ember.isPresent(this.get("yAxisRoom")));
-  }).on("didInsertElement"),
 
-  didSetupD3: observer(function() {
     Ember.assert("must have element", Ember.isPresent(this.get("element")));
     Ember.assert("must have margin", Ember.isPresent(this.get("margin")));
     Ember.assert("must have plotHeight", Ember.isPresent(this.get("plotHeight")));
     Ember.assert("must have plotWidth", Ember.isPresent(this.get("plotWidth")));
-  }),
+
+    Ember.assert("must have setupD3", Ember.isPresent(this.get("setupD3")));
+    Ember.assert("must have updateD3", Ember.isPresent(this.get("updateD3")));
+    Ember.assert("must have chartEnter", Ember.isPresent(this.get("chartEnter")));
+    Ember.assert("must have chartUpdate", Ember.isPresent(this.get("chartUpdate")));
+
+    if (this.get("svgExists")) {
+      this.updateD3();
+    } else {
+      this.setupD3();
+      this.updateD3();
+    }
+  }).on("didInsertElement"),
 
   colorPalette: FLAREDOWN_COLORS,
   formatCount: d3.format("d"),
@@ -63,6 +73,29 @@ export default Ember.Mixin.create({
     // BEWARE, d3 sets stuff on .select (don't watch for "element")
     return d3.select(this.get("element")).select("svg g");
   }),
+
+  svgExists: computed(function() {
+    return $(this.get("#" + "elementId")).find("svg").length;
+  }),
+
+  setupD3: function() {
+    this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
+    this.chartEnter();
+    this.drawXAxis(this.get("xAxis"), this.get("svg"), this.get("plotHeight"));
+    this.drawYAxis(this.get("yAxis"), this.get("svg"), this.get("yAxisRoom")); 
+  },
+
+  updateD3: function() {
+    this.chartUpdate();
+
+    this.get("svg").selectAll(".x.axis")
+      .call(this.get("xAxis"));
+
+    this.get("svg").selectAll(".y.axis")
+      .call(this.get("yAxis"));
+
+    this.drawTitle(this.get("titleString"), this.get("element"));
+  },
 
   drawSvg: function(chartElement, plotWidth, plotHeight, margin) {
     d3.select(chartElement).append("svg")
@@ -89,7 +122,6 @@ export default Ember.Mixin.create({
       .call(axis)
     .selectAll(".tick text")
       .call(truncate, yAxisRoom, 0);
-    // .append("svg:title")
-    //   .text(function(d) { return d; });
   }
+
 });

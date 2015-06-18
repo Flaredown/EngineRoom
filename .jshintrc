@@ -22,6 +22,7 @@
     "SVGPathSeg": false
   },
   "immed": false,
+  "jquery": true,
   "laxbreak": false,
   "newcap": true,
   "noarg": true,
