@@ -69,6 +69,7 @@ export default Ember.Mixin.create({
     };
   }),
 
+  // TODO rename this: it returns the chart root "g" element, NOT "svg"
   svg: computed(function() {
     // BEWARE, d3 sets stuff on .select (don't watch for "element")
     return d3.select(this.get("element")).select("svg g");
