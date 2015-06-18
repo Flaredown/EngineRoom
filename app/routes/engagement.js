@@ -45,6 +45,11 @@ export default Ember.Route.extend(HistogramMixin, {
           specs = m[1];
 
       // TODO: case logic ripe for a refactor
+
+      // adapters for data sources
+      // models for chart types
+      // filters at KPI level
+      // KPI metrics must be filterable in the same way as each other ... yeah
       switch (specs.chartType) {
         case "histogram":
           var process = self.get("processHistogram");
@@ -73,25 +78,5 @@ export default Ember.Route.extend(HistogramMixin, {
     });
     
     controller.set("model", processedModel);
-
-    // Ember.run.later(function() {
-    //   var newModel = [
-    //     {
-    //       specs: {
-    //         "chartType": "histogram",
-    //         "queryType": "count_unique",
-    //         "queryParams": {
-    //           "eventCollection": "entries",
-    //           "targetProperty": "user_id",
-    //           "groupBy": "n_conditions"
-    //         },
-    //       },
-    //       processed: [0, 1, 1, 3, 3, 4]
-    //     }
-    //   ];
-
-    //   controller.set("model", newModel);
-
-    // }, 2000);
   }
 });
