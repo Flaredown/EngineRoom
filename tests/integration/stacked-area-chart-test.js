@@ -66,16 +66,24 @@ test("it draws a legend", function() {
   var expectedLegendEntryN = processedData[0].value.length;
   equal(legendEntries.length, expectedLegendEntryN);
 
-  var legendRects = null;
+  var legendRects = svg.find(".legend rect");
   equal(legendRects.length, expectedLegendEntryN);
 
-  var legendLabels = null;
+  var legendLabels = svg.find(".legend text");
   equal(legendLabels.length, expectedLegendEntryN);
 
 });
 
 test("legend labels are truncated", function() {
-  ok(null);
+  var svg = component.$().find("svg");
+  var legendLabels = svg.find(".legend text");
+  var longLabel = component.get("groups")[3];  // fragile, depends on fixture
+
+  var magicNumber = 7;  // fragile, depends on component.yAxisRoom and axis label text
+  var expectedTruncation = longLabel.slice(0, magicNumber) + "...";
+
+  equal(legendLabels[3].textContent, expectedTruncation);
+
 });
 
 // using other fixtures
@@ -85,15 +93,21 @@ test("it updates the chart based on changes in data", function() {
 
   this.subject().set("data", stackedAreaChartFixture().large);
 
-  var largeFixtureGroups = svg.find(".group");
-  equal(largeFixtureGroups.length, component.get("data").processed[0].value.length,
-    "updates to a large dataset"
+  equal(svg.find(".group").length, component.get("data").processed[0].value.length,
+    "updates to a large dataset: groups"
+  );
+
+  equal(svg.find(".legend").length, component.get("data").processed[0].value.length,
+    "updates to a large dataset: legend"
   );
 
   this.subject().set("data", stackedAreaChartFixture().small);
 
-  var smallFixtureGroups = svg.find(".group");
-  equal(smallFixtureGroups.length, component.get("data").processed[0].value.length,
-    "updates to a small dataset"
+  equal(svg.find(".group").length, component.get("data").processed[0].value.length,
+    "updates to a small dataset: groups"
   );
+
+  equal(svg.find(".legend").length, component.get("data").processed[0].value.length,
+    "updates to a small dataset: legend"
+  );  
 });

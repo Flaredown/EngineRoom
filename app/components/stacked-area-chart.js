@@ -133,13 +133,13 @@ export default Ember.Component.extend(Chart, {
     this.set("legendRoom", 90);
   },
 
-  chartElements: function(){
+  chartElements: function() {
     // this returns the update selection
     return this.get("svg").selectAll(".group").data(this.get("groupedData"));   
   },
 
-  chartEnter: function(){
-     var enterSelection = this.get("svg").selectAll("path.group")
+  chartEnter: function() {
+    var enterSelection = this.get("svg").selectAll("path.group")
       .data(this.get("groupedData"))
       .enter();   
 
@@ -147,9 +147,11 @@ export default Ember.Component.extend(Chart, {
       .attr("class", "group")
       .attr("d", (d) => { return this.get("areaFunction")(d.values); })
       .style("fill", (d) => { return this.get("colorScale")(d.groupBy); });
+
+    this.legendEnter();
   },
 
-  chartUpdate: function(){
+  chartUpdate: function() {
     this.chartEnter();
 
     var updateSelection = this.chartElements();
@@ -159,43 +161,83 @@ export default Ember.Component.extend(Chart, {
 
     var exitSelection = updateSelection.exit();
     exitSelection.remove();        
+
+    this.legendUpdate();
   },
 
-  didInsertElement(){
+  legendElements: function() {
+    // this returns the update selection
+    return this.get("svg").selectAll(".legend").data(this.get("groupedData"));       
+  },
 
-    // var legend = svg.selectAll(".legend")
-    //   .data(grouped)
-    //   .enter()
-    // .append("g")
-    //   .attr("class", "legend")
-    //   .attr("transform", function(d, i) {
-    //     var legendEntryHeight = self.get("legendRectSize") + self.get("legendSpacing");
-    //     //var offset = legendEntryHeight * groups.length
-    //     var offset = 0;
-    //     var horz = plotWidth + 10;
-    //     var vert = i * legendEntryHeight - offset;
-    //     return "translate(" + horz + "," + vert + ")";
-    //   });
+  legendEnter: function() {
+    var enterSelection = this.get("svg").selectAll(".legend")
+      .data(this.get("groupedData"))
+      .enter();   
 
-    // legend.append("rect")
-    //   .attr("width", this.get("legendRectSize"))
-    //   .attr("height", this.get("legendRectSize"))
-    //   .style("fill", function(d) { 
-    //     return color(d.groupBy);
-    //   })
-    //   .style("stroke", function(d) { 
-    //     return color(d.groupBy);
-    //   });
+    var legendGs = enterSelection.append("g")
+      .attr("class", "legend")
+      .attr("transform", (d, i) => {
+        var legendEntryHeight = this.get("legendRectSize") + this.get("legendSpacing");
+        var offset = 0;
+        var horz = this.get("plotWidth") + 10;
+        var vert = i * legendEntryHeight - offset;
+        return "translate(" + horz + "," + vert + ")";
+      });
 
-    // // legend.append("text")
-    // //   .attr("x", legendRectSize + legendSpacing)
-    // //   .attr("y", legendRectSize - legendSpacing)
-    // //   .text(function(d) { return d.groupBy; });
+    legendGs.append("rect")
+      .attr("width", this.get("legendRectSize"))
+      .attr("height", this.get("legendRectSize"))
+      .style("fill", (d) => { 
+        return this.get("colorScale")(d.groupBy);
+      })
+      .style("stroke", (d) => { 
+        return this.get("colorScale")(d.groupBy);
+      });
 
-    // // legend.selectAll("text")
-    // //   .call(truncate, legendRoom - legendRectSize - legendSpacing, 0)
-    // // .append("svg:title")
-    // //   .text(function(d) { return d.groupBy; });
+    legendGs.append("text")
+      .attr("x", this.get("legendRectSize") + this.get("legendSpacing"))
+      .attr("y", this.get("legendRectSize") - this.get("legendSpacing"))
+      .text(function(d) { return d.groupBy; })
+      .call(
+        this.truncate,
+        this.get("legendRoom") - this.get("legendRectSize") - this.get("legendSpacing"),
+        0
+      );
+  },
 
+  legendUpdate: function() {
+    var updateSelection = this.legendElements();
+
+    updateSelection.attr("transform", (d, i) => {
+        var legendEntryHeight = this.get("legendRectSize") + this.get("legendSpacing");
+        var offset = 0;
+        var horz = this.get("plotWidth") + 10;
+        var vert = i * legendEntryHeight - offset;
+        return "translate(" + horz + "," + vert + ")";
+      });
+
+    updateSelection.selectAll("rect")
+      .attr("width", this.get("legendRectSize"))
+      .attr("height", this.get("legendRectSize"))
+      .style("fill", (d) => { 
+        return this.get("colorScale")(d.groupBy);
+      })
+      .style("stroke", (d) => { 
+        return this.get("colorScale")(d.groupBy);
+      });
+
+    updateSelection.selectAll("text")
+      .attr("x", this.get("legendRectSize") + this.get("legendSpacing"))
+      .attr("y", this.get("legendRectSize") - this.get("legendSpacing"))
+      .text(function(d) { return d.groupBy; })
+      .call(
+        this.truncate,
+        this.get("legendRoom") - this.get("legendRectSize") - this.get("legendSpacing"),
+        0
+      );
+      
+    var exitSelection = updateSelection.exit();
+    exitSelection.remove();
   }
 });

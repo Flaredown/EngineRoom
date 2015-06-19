@@ -13,20 +13,6 @@ const MARGIN_BASE = 12;
 const PADDING_TOP = 0;
 const PADDING_RIGHT = 10;
 
-function truncate(text, width, padding) {
-  text.each(function() {
-    var self = d3.select(this),
-      textLength = self.node().getComputedTextLength(),
-      text = self.text();
-    while (textLength > (width - 2 * padding) && text.length > 0) {
-      text = text.slice(0, -1);
-      self.text(text + '...');
-      textLength = self.node().getComputedTextLength();
-    }
-  });
-}
-
-
 export default Ember.Mixin.create({
 
   dataChanged: observer("data", function() {
@@ -95,7 +81,7 @@ export default Ember.Mixin.create({
     this.get("svg").selectAll(".y.axis")
       .call(this.get("yAxis"))
     .selectAll(".tick text")
-      .call(truncate, this.get("yAxisRoom"), 0);      
+      .call(this.truncate, this.get("yAxisRoom"), 0);      
 
     this.drawTitle(this.get("titleString"), this.get("element"));
   },
@@ -123,6 +109,18 @@ export default Ember.Mixin.create({
     target.append("g")
       .attr("class", "y axis")
       .call(axis);
-  }
+  },
 
+  truncate: function(text, width, padding) {
+    text.each(function() {
+      var self = d3.select(this),
+        textLength = self.node().getComputedTextLength(),
+        text = self.text();
+      while (textLength > (width - 2 * padding) && text.length > 0) {
+        text = text.slice(0, -1);
+        self.text(text + '...');
+        textLength = self.node().getComputedTextLength();
+      }
+    });
+  }
 });
