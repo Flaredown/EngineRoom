@@ -93,7 +93,9 @@ export default Ember.Mixin.create({
       .call(this.get("xAxis"));
 
     this.get("svg").selectAll(".y.axis")
-      .call(this.get("yAxis"));
+      .call(this.get("yAxis"))
+    .selectAll(".tick text")
+      .call(truncate, this.get("yAxisRoom"), 0);      
 
     this.drawTitle(this.get("titleString"), this.get("element"));
   },
@@ -117,12 +119,10 @@ export default Ember.Mixin.create({
       .call(axis);
   },
 
-  drawYAxis: function(axis, target, yAxisRoom) {
+  drawYAxis: function(axis, target) {
     target.append("g")
       .attr("class", "y axis")
-      .call(axis)
-    .selectAll(".tick text")
-      .call(truncate, yAxisRoom, 0);
+      .call(axis);
   }
 
 });

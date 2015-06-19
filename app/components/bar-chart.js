@@ -2,26 +2,10 @@ import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
 
-function _drawBars(data, groupBy, xScale, yScale, target, height, colorScale) {
-
-  var bar = target.selectAll(".bar")
-    .data(data)
-    .enter()
-  .append("g")
-    .attr("class", "bar")
-    .style("fill", function(d, i) { return colorScale(i); })
-    .attr("transform", function(d) {
-      return "translate(0, " + yScale(d[groupBy]) + ")";
-    });
-
-  bar.append("rect")
-      .attr("x", 1)
-      .attr("width", function(d) { return xScale(d.result); })
-      .attr("height", yScale.rangeBand);
-
-}
 
 export default Ember.Component.extend(Chart, {
+
+  maxBars: 12,
 
   chartDivWidth: computed("chartElement", function() {
     return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
@@ -31,39 +15,25 @@ export default Ember.Component.extend(Chart, {
     return "#" + this.get("elementId") + " .chart";
   }),
 
+  colorScale: computed("colorPalette", function() {
+    return d3.scale.ordinal().range(this.get("colorPalette"));
+  }),
+
   groupBy: computed("data", function() {
     return this.get("data").specs.queryParams.groupBy;
   }),
 
-  titleString: computed("data", function() {
-    var spec = this.get("data").specs;
-    return spec.queryType +
-      " " + spec.queryParams.targetProperty +
-      " in " + spec.queryParams.eventCollection +
-      " by " + spec.queryParams.groupBy;
+  plotHeight: computed("chartDivHeight", "margin", function(){
+    return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
   }),
 
-  willInsertElement(){
-    this.set("chartDivHeight", 250);
-    this.set("xAxisRoom", 13);
-    this.set("yAxisRoom", 78);
-    this.set("legendRoom", 0);
-  },
+  plotWidth: computed("chartDivWidth", "margin", function(){
+    return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
+  }),
 
-  didInsertElement(){
-
-    this.set("maxBars", 12);
-
-    var color = d3.scale.ordinal()
-      .range(this.get("colorPalette"));
-
-    var plotWidth = this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right,
-        plotHeight = this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
-
-    var groupBy = this.get("groupBy");
-
-    // TODO: this should go in route
-    var data = this.get("data").processed.sort(
+  sortedData: computed("data", "groupBy", "maxBars", function(){
+    // TODO: should this go in route?
+    return this.get("data").processed.sort(
       function (a, b) {
         if (a.result > b.result) {
           return -1;
@@ -74,36 +44,88 @@ export default Ember.Component.extend(Chart, {
         // a must be equal to b
         return 0;
       })
-        .filter(function(value) { return value[groupBy] !== null; })
-        .slice(0, this.get("maxBars"));
+        .filter((value) => { return value[this.get("groupBy")] !== null; })
+        .slice(0, this.get("maxBars"));    
+  }),
 
-    var x = d3.scale.linear()
-        .domain([0, d3.max(data, function(d) { return d.result; })])
-        .range([0, plotWidth]);
+  titleString: computed("data", function() {
+    var spec = this.get("data").specs;
+    return spec.queryType +
+      " " + spec.queryParams.targetProperty +
+      " in " + spec.queryParams.eventCollection +
+      " by " + spec.queryParams.groupBy;
+  }),
 
-    var y = d3.scale.ordinal()
-        .domain(data.map(function(d) { return d[groupBy]; }))
-        .rangeRoundBands([0, plotHeight], 0.1);
-
-    var xAxis = d3.svg.axis()
-      .scale(x)
+  xAxis: computed("xScale", "formatCount", function(){
+    return d3.svg.axis()
+      .scale(this.get("xScale"))
       .orient("bottom")
       .ticks(4)
       .tickFormat(this.get("formatCount"))
       .tickSubdivide(0);
+  }),
 
-    var yAxis = d3.svg.axis()
-      .scale(y)
+  xScale: computed("sortedData", "plotWidth", function(){
+    return d3.scale.linear()
+      .domain([0, d3.max(this.get("sortedData"), (d) => { return d.result; })])
+      .range([0, this.get("plotWidth")]);
+  }),
+
+  yAxis: computed("yScale", "sortedData", function(){
+    return d3.svg.axis()
+      .scale(this.get("yScale"))
       .orient("left")
-      .ticks(data.length);
+      .ticks(this.get("sortedData").length);
+  }),
 
-    var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, this.get("margin"));
+  yScale: computed("groupBy", "sortedData", "plotHeight", function(){
+    return d3.scale.ordinal()
+      .domain(this.get("sortedData").map((d) => { return d[this.get("groupBy")]; }))
+      .rangeRoundBands([0, this.get("plotHeight")], 0.1);    
+  }),
 
-    _drawBars(data, this.get("groupBy"), x, y, svg, plotHeight, color);
-    this.get("drawXAxis")(xAxis, svg, plotHeight);
-    this.get("drawYAxis")(yAxis, svg, this.get("yAxisRoom"));
-    this.get("drawTitle")(this.get("titleString"), this.element);
+  chartElements: function() {
+    // this returns the update selection
+    return this.get("svg").selectAll(".bar").data(this.get("sortedData"));
+  },
 
-    // NEXT: TDD the truncate function
-  }
+  chartEnter: function(){
+    var enterSelection = this.get("svg").selectAll("rect.bar")
+      .data(this.get("sortedData"))
+      .enter();
+
+    enterSelection.append("rect")
+      .attr("class", "bar")
+      .style("fill", (d, i) => { return this.get("colorScale")(i); })
+      .attr("transform", (d) => {
+        return "translate(0, " + this.get("yScale")(d[this.get("groupBy")]) + ")";
+      })
+      .attr("x", 1)
+      .attr("width", (d) => { return this.get("xScale")(d.result); })
+      .attr("height", this.get("yScale").rangeBand);
+  },
+
+  chartUpdate: function(){
+    this.chartEnter();
+
+    var updateSelection = this.chartElements();
+
+    updateSelection.style("fill", (d, i) => { return this.get("colorScale")(i); })
+      .attr("transform", (d) => {
+        return "translate(0, " + this.get("yScale")(d[this.get("groupBy")]) + ")";
+      })
+      .attr("x", 1)
+      .attr("width", (d) => { return this.get("xScale")(d.result); })
+      .attr("height", this.get("yScale").rangeBand);
+
+    var exitSelection = updateSelection.exit();
+    exitSelection.remove();        
+  },
+
+  willInsertElement(){
+    this.set("chartDivHeight", 250);
+    this.set("xAxisRoom", 13);
+    this.set("yAxisRoom", 78);
+    this.set("legendRoom", 0);
+  },
 });

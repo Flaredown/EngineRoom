@@ -3,7 +3,7 @@ import histogramChartFixture from "../fixtures/histogram-chart-fixture";
 
 let component;
 
-moduleForComponent("histogram-chart", "HistogramChartComponent Integration", {
+moduleForComponent("histogram-chart", "HistogramChartComponent", {
   needs: [],
   setup: function() {
     component = this.subject(
@@ -32,11 +32,10 @@ test("it sizes the svg based on div size and margin options", function() {
 
 test("it draws as many bars as the maximum value in the data + 1 for a small dataset", function() {
   var svg = component.$().find("svg");
-  var bars = svg.find(".bar");
 
   var expected_n_bars = 5;  // fragile, from fixture
 
-  equal(bars.length, expected_n_bars);
+  equal(svg.find(".bar").length, expected_n_bars);
 });
 
 test("it draws the bars to the right height", function() {

@@ -1,79 +1,33 @@
 import { moduleForComponent, test } from "ember-qunit";
 import barChartFixture from "../fixtures/bar-chart-fixture";
 
+let component;
 
 moduleForComponent("bar-chart", "BarChartComponent", {
   needs: [],
   setup: function() {
-    var fixture = barChartFixture();
-
-    this.subject().set("data", fixture.small);
+    component = this.subject(
+      {data: barChartFixture().small}
+    );
+    this.render();    
   },
   tearDown: function() {
     //
   }
 });
 
-test("it renders", function() {
-  var component = this.subject();
-  equal(component._state, "preRender");
-  this.render();
-
-  equal(component._state, "inDOM");
-});
-
 test("it sizes the svg based on div size and margin options", function() {
-  var component = this.subject();
-  this.render();
-
   var svg = component.$().find("svg");
 
   ok(svg, "draws the svg");
 
   var chartDiv = component.$().find(".chart");
+
   var expectedSvgWidth = chartDiv.width();
   var expectedSvgHeight = component.get("chartDivHeight");
 
   equal(svg.width(), expectedSvgWidth, "width");
   equal(svg.height(), expectedSvgHeight, "height");
-});
-
-test("it draws axes", function() {
-  var component = this.subject();
-  this.render();
-
-  var svg = component.$().find("svg");
-  var xAxis = svg.find(".x");
-  var yAxis = svg.find(".y");
-
-  ok(xAxis);
-  ok(yAxis);
-});
-
-test("it writes a chart title", function() {
-  var component = this.subject();
-  this.render();
-
-  var title = component.$().find(".chart-title");
-
-  var expectedTitle = component.get("titleString");
-
-  equal(title.text(), expectedTitle);
-});
-
-test("it truncates long y-axis labels", function() {
-  var component = this.subject();  
-  this.render();
-
-  var longLabel = component.get("data").processed[0].name;  // fragile, depends on fixture
-
-  var yAxis = component.$().find(".y");
-  var yAxisLabels = yAxis.find("text");
-
-  var magicNumber = 13;  // fragile, depends on component.yAxisRoom and axis label text
-  var expectedTruncation = longLabel.slice(0, magicNumber) + "...";
-
-  equal(yAxisLabels[0].textContent, expectedTruncation);
 });
 
 test("it draws as many bars as groups for a small dataset", function() {
@@ -94,24 +48,53 @@ test("it draws the bars to the right width", function() {
 
   var svg = component.$().find("svg");
   var bars = svg.find(".bar");
-  var barWidth = parseInt(bars.find("rect").first().attr("width"));
+  var barWidth = parseInt(bars.first().attr("width"));
 
   var expectedBarWidth = 1154;  // fragile, depends on fixture and chart width
 
   equal(barWidth, expectedBarWidth);
 });
 
+test("it draws axes", function() {
+  var svg = component.$().find("svg");
+  var xAxis = svg.find(".x");
+  var yAxis = svg.find(".y");
+
+  ok(xAxis);
+  ok(yAxis);
+});
+
+test("it writes a chart title", function() {
+  var title = component.$().find(".chart-title");
+
+  equal(title.text(), component.get("titleString"));
+});
+
+//
+
+test("it truncates long y-axis labels", function() {
+  var longLabel = component.get("data").processed[0].name;  // fragile, depends on fixture
+
+  var yAxis = component.$().find(".y");
+  var yAxisLabels = yAxis.find("text");
+
+  var magicNumber = 13;  // fragile, depends on component.yAxisRoom and axis label text
+  var expectedTruncation = longLabel.slice(0, magicNumber) + "...";
+
+  equal(yAxisLabels[0].textContent, expectedTruncation);
+});
+
 // using other fixtures
 
-test("it draws a maximum number of bars for a large dataset", function() {
-  var fixture = barChartFixture();
-  this.subject().set("data", fixture.large);
-
-  var component = this.subject();
-  this.render();
-
+test("it updates the chart based on changes in data", function() {
   var svg = component.$().find("svg");
-  var bars = svg.find(".bar");
 
-  equal(bars.length, component.get("maxBars"));
+  this.subject().set("data", barChartFixture().large);
+
+  equal(svg.find(".bar").length, component.get("maxBars"),
+    "updates to large dataset and shows a maximum number of bars");
+
+  this.subject().set("data", barChartFixture().small);
+
+  equal(svg.find(".bar").length, 7, "updates to small dataset and shows all bars");
 });
