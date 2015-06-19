@@ -100,7 +100,8 @@ export default Ember.Component.extend(Chart, {
   },
 
   chartEnter: function(){
-    var updateSelection = this.chartElements();
+    var updateSelection = this.get("svg").selectAll(".line")
+      .data([this.get("timestampedData")]);
     var enterSelection = updateSelection.enter();
 
     enterSelection.append("path")
@@ -112,6 +113,7 @@ export default Ember.Component.extend(Chart, {
     updateSelection.attr("d", this.get("lineFunction"));
     
   },
+
   chartUpdate: function(){
     this.chartEnter();
 

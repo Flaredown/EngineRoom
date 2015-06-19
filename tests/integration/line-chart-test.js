@@ -73,14 +73,14 @@ test("it updates the chart based on changes in data", function() {
   this.subject().set("data", lineChartFixture().large);
 
   var largeFixtureSegments = _segments(component.$().find("svg").find(".line")[0]);
-  equal(largeFixtureSegments.length, lineChartFixture().large.processed.length,
+  equal(largeFixtureSegments.length, component.get("data").processed.length,
     "updates to a large dataset"
   );
 
   this.subject().set("data", lineChartFixture().small);
 
   var smallFixtureSegments = _segments(component.$().find("svg").find(".line")[0]);
-  equal(smallFixtureSegments.length, lineChartFixture().small.processed.length,
+  equal(smallFixtureSegments.length, component.get("data").processed.length,
     "updates to a small dataset"
   );
 });
