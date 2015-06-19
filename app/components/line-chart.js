@@ -17,9 +17,9 @@ function _drawLine(data, xScale, yScale, target, color) {
     .attr("d", line);
 }
 
-var n_days = 21;  // TODO un-hardcode
-
 export default Ember.Component.extend(Chart, {
+
+  nDays: 21,  // TODO: unhardcode
 
   chartDivWidth: computed("chartElement", function() {
     return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
@@ -29,14 +29,103 @@ export default Ember.Component.extend(Chart, {
     return "#" + this.get("elementId") + " .chart";
   }),
 
-  titleString: computed("data", function() {
-  var spec = this.get("data").specs;
-  return spec.queryType +
-    " " + spec.queryParams.targetProperty +
-    " in " + spec.queryParams.eventCollection +
-    " " + spec.queryParams.interval +
-    " over " + spec.queryParams.timeframe;
+  colorScale: computed("colorPalette", function() {
+    return d3.scale.ordinal().range(this.get("colorPalette"));
   }),
+
+  lineFunction: computed("", function(){
+    return d3.svg.line()
+      .x((d) => { return this.get("xScale")(d.date); })
+      .y((d) => { return this.get("yScale")(d.value); });    
+  }),
+
+  plotWidth: computed("chartDivWidth", "margin", function() {
+    return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
+  }),
+
+  plotHeight: computed("chartDivHeight", "margin", function() {
+    return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
+  }),
+
+  timestampedData: computed("data", "formatDateKeen", function() {
+    return this.get("data").processed.map((d) => {
+      d.date = this.get("formatDateKeen").parse(d.timeframe.start);
+      return d;
+    });
+  }), 
+
+  titleString: computed("data", function() {
+    var spec = this.get("data").specs;
+    return spec.queryType +
+      " " + spec.queryParams.targetProperty +
+      " in " + spec.queryParams.eventCollection +
+      " " + spec.queryParams.interval +
+      " over " + spec.queryParams.timeframe;
+  }),
+
+  xAxis: computed("formatDateDisplay", "nDays", "xScale", function() {
+    return d3.svg.axis()
+      .scale(this.get("xScale"))
+      .orient("bottom")
+      .ticks(this.get("nDays"))
+      .tickFormat(this.get("formatDateDisplay"))
+      .tickSubdivide(0);
+  }),
+
+  xScale: computed("paddingRight", "plotWidth", "timestampedData", function() {
+    return d3.time.scale()
+      .domain(d3.extent(this.get("timestampedData"), function(d) { return d.date; }))
+      .range([0, this.get("plotWidth") - this.get("paddingRight")]);
+  }),
+
+  yAxis: computed("formatCount", "yScale", function() {
+    return d3.svg.axis()
+      .scale(this.get("yScale"))
+      .orient("left")
+      .ticks(4)
+      .tickFormat(this.get("formatCount"))
+      .tickSubdivide(0);
+  }),
+
+  yScale: computed("paddingTop", "plotHeight", "timestampedData", function() {
+    return d3.scale.linear()
+      .domain([0, d3.max(this.get("timestampedData"), function(d) { return d.value; })])
+      .range([this.get("plotHeight"), 0 + this.get("paddingTop")]);
+  }),
+
+  chartElements: function(){
+    // this returns the update selection
+    // note that data is wrapped in an array: this is to get joins to work with line graphs
+    return this.get("svg").selectAll(".line").data([this.get("timestampedData")]);    
+  },
+
+  chartEnter: function(){
+    var updateSelection = this.chartElements();
+    var enterSelection = updateSelection.enter();
+
+    enterSelection.append("path")
+      .attr("class", "line")
+      .style("stroke", this.get("colorPalette"))
+      .style("stroke-width", 2) // TODO handle in css?
+      .style("fill", "none");
+
+    updateSelection.attr("d", this.get("lineFunction"));
+    
+  },
+  chartUpdate: function(){
+    this.chartEnter();
+
+    var updateSelection = this.chartElements();
+
+    updateSelection.attr("d", this.get("lineFunction"))
+      .attr("class", "line")
+      .style("stroke", this.get("colorPalette")[0])
+      .style("stroke-width", 2) // TODO handle in css?
+      .style("fill", "none");
+
+    var exitSelection = updateSelection.exit();
+    exitSelection.remove(); 
+  },
 
   willInsertElement(){
     this.set("chartDivHeight", 250);
@@ -44,50 +133,4 @@ export default Ember.Component.extend(Chart, {
     this.set("yAxisRoom", 25);
     this.set("legendRoom", 0);
   },
-
-  didInsertElement(){
-
-    var color = d3.scale.ordinal()
-      .range(this.get("colorPalette"));
-
-    var plotWidth = this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right,
-        plotHeight = this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
-
-    // TODO: put in route?
-    var self = this;
-    var data = this.get("data").processed.map(function(d) {
-      d.date = self.get("formatDateKeen").parse(d.timeframe.start);
-      return d;
-    });
-
-    var x = d3.time.scale()
-      .domain(d3.extent(data, function(d) { return d.date; }))
-      .range([0, plotWidth - this.get("paddingRight")]);
-
-    var y = d3.scale.linear()
-      .domain([0, d3.max(data, function(d) { return d.value; })])
-      .range([plotHeight, 0 + this.get("paddingTop")]);
-
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom")
-      .ticks(n_days)
-      .tickFormat(this.get("formatDateDisplay"))
-      .tickSubdivide(0);
-
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .ticks(4)
-      .tickFormat(this.get("formatCount"))
-      .tickSubdivide(0);
-
-    var svg = this.get("drawSvg")(this.get("chartElement"), plotWidth, plotHeight, this.get("margin"));
-
-    _drawLine(data, x, y, svg, color());
-    this.get("drawXAxis")(xAxis, svg, plotHeight);
-    this.get("drawYAxis")(yAxis, svg, this.get("yAxisRoom"));
-    this.get("drawTitle")(this.get("titleString"), this.element);
-
-  }
 });

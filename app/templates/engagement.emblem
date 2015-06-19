@@ -1,6 +1,7 @@
 histogram-chart data=histoOne
-/ line-chart data=lineOne
+line-chart data=lineOne
 bar-chart data=barOne
+
 / stacked-area-chart data=stackedAreaOne
 
 outlet

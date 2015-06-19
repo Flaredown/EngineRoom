@@ -1,31 +1,22 @@
 import { moduleForComponent, test } from "ember-qunit";
 import lineChartFixture from "../fixtures/line-chart-fixture";
 
+let component;
 
 moduleForComponent("line-chart", "LineChartComponent", {
   needs: [],
   setup: function() {
-    var fixture = lineChartFixture();
-
-    this.subject().set("data", fixture);
+    component = this.subject(
+      {data: lineChartFixture().small}
+    );
+    this.render();    
   },
   tearDown: function() {
     //
   }
 });
 
-test("it renders", function() {
-  var component = this.subject();
-  equal(component._state, "preRender");
-  this.render();
-
-  equal(component._state, "inDOM");
-});
-
 test("it sizes the svg based on div size and margin options", function() {
-  var component = this.subject();
-  this.render();
-
   var svg = component.$().find("svg");
 
   ok(svg, "draws the svg");
@@ -39,12 +30,27 @@ test("it sizes the svg based on div size and margin options", function() {
   equal(svg.height(), expectedSvgHeight, "height");
 });
 
+test("it draws a line", function() {
+  var processedData = lineChartFixture().small.processed;
 
+  var svg = component.$().find("svg");
+  var line = svg.find(".line")[0];
+
+  ok(line, "draws the line");
+
+  var segments = _segments(line);
+
+  var expectedSegmentCount = processedData.length;
+  equal(segments.length, expectedSegmentCount, "draws the right number of segments");
+
+  var expectedSegmentX = 998;  // fragile, based on fixture and div width/height
+  var expectedSegmentY = 12;  // fragile, based on fixture and div width/height
+
+  equal(Math.round(segments[5].x), expectedSegmentX, "segments go in the right place: x"); 
+  equal(Math.round(segments[5].y), expectedSegmentY, "segments go in the right place: y"); 
+});
 
 test("it draws axes", function() {
-  var component = this.subject();
-  this.render();
-
   var svg = component.$().find("svg");
   var xAxis = svg.find(".x");
   var yAxis = svg.find(".y");
@@ -54,27 +60,32 @@ test("it draws axes", function() {
 });
 
 test("it writes a chart title", function() {
-  var component = this.subject();
-  this.render();
-
   var title = component.$().find(".chart-title");
 
-  var expectedTitle = component.get("titleString");
-
-  equal(title.text(), expectedTitle);
+  equal(title.text(), component.get("titleString"));
 });
 
-test("it draws a line", function() {
-  var component = this.subject();  
-  this.render();
+// using other fixtures
 
-  var processedData = component.get("data").processed;
-
+test("it updates the chart based on changes in data", function() {
   var svg = component.$().find("svg");
-  var line = svg.find(".line")[0];
 
-  ok(line, "draws the line");
+  this.subject().set("data", lineChartFixture().large);
 
+  var largeFixtureSegments = _segments(component.$().find("svg").find(".line")[0]);
+  equal(largeFixtureSegments.length, lineChartFixture().large.processed.length,
+    "updates to a large dataset"
+  );
+
+  this.subject().set("data", lineChartFixture().small);
+
+  var smallFixtureSegments = _segments(component.$().find("svg").find(".line")[0]);
+  equal(smallFixtureSegments.length, lineChartFixture().small.processed.length,
+    "updates to a small dataset"
+  );
+});
+
+function _segments(line) {
   var segments = [];
   for (var i = 0 ; i < line.pathSegList.numberOfItems; i++) {
     var item = line.pathSegList.getItem(i);
@@ -86,14 +97,5 @@ test("it draws a line", function() {
        segments.push({x: item.x, y: item.y});
     }
   }
-
-  var expectedSegmentCount = processedData.length;
-  equal(segments.length, expectedSegmentCount, "draws the right number of segments");
-
-  var expectedSegmentX = 460;  // fragile, based on fixture and div width/height
-  var expectedSegmentY = 12;  // fragile, based on fixture and div width/height
-
-  equal(Math.round(segments[5].x), expectedSegmentX, "segments go in the right place: x"); 
-  equal(Math.round(segments[5].y), expectedSegmentY, "segments go in the right place: y"); 
-
-});
+  return segments;
+}
