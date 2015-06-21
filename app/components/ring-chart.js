@@ -7,12 +7,13 @@ export default Ember.Component.extend(Chart, {
 
   legendRectSize: 18,
   legendSpacing: 4,
+  xAxis: null,  // TODO: is this the right way to handle not needing axes?
+  yAxis: null,
 
-  areaFunction: computed("xScale", "yScale", function() {
-    return d3.svg.area()
-      .x((d) => { return this.get("xScale")(d.date); })
-      .y0((d) => { return this.get("yScale")(d.y0); })
-      .y1((d) => { return this.get("yScale")(d.y0 + d.y); });
+  arcFunction: computed("holeWidth", "radius", function() {
+    return d3.svg.arc()
+      .innerRadius(this.get("radius") - this.get("holeWidth"))
+      .outerRadius(this.get("radius"));
   }),
 
   chartDivWidth: computed("chartElement", function() {
@@ -21,7 +22,7 @@ export default Ember.Component.extend(Chart, {
 
   chartElement: computed("elementId", function() {
     return "#" + this.get("elementId") + " .chart";
-  }),
+  }),  
 
   colorScale: computed("colorPalette", "groups", function() {
     return d3.scale.ordinal()
@@ -29,49 +30,54 @@ export default Ember.Component.extend(Chart, {
       .range(this.get("colorPalette"));
   }),
 
-  groupBy: computed("data", function() {
-    return this.get("data").specs.queryParams.groupBy;
-  }),
-
-  groupedData: computed("colorScale", "data", "formatDateKeen", "groups", "stackFunction", function(){
+  groupedData: computed("data", "groups", function(){
     var _data = this.get("data").processed;
 
-    _data.forEach((d) => {
-      d.date = this.get("formatDateKeen").parse(d.timeframe.start);
-      d.total = d.value
-        .map(function(x) { return x.result; })
-        .reduce(function(previousValue, currentValue) {
-          return previousValue + currentValue;
-        });
-    });
-
-    return this.get("stackFunction")(this.get("colorScale").domain().map((name) => {
+    return this.get("groups").map((name) => {
       return {
         groupBy: name,
-        values: _data.map((d) => {
-          return { date: d.date, y: d.value[this.get("groups").indexOf(name)].result };
-        })
+        value: _data.map((d) => { return d.result; })[this.get("groups").indexOf(name)]
       };
-    }));
-  }),
-
-  groups: computed("data", "groupBy", function() {
-    return this.get("data").processed[0].value.map((x) => {
-      return x[this.get("groupBy")];
     });
   }),
 
-  plotWidth: computed("chartDivWidth", "margin", function(){
-    return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
+  groups: computed("data", function() {
+    return this.get("data").processed.map((d) => {
+      return d.name;
+    });
+  }),
+
+  holeWidth: computed("radius", function() {
+    return this.get("radius") / 2;
+  }),
+
+  pieData: computed("groupedData", function() {
+    var pieFunction = d3.layout.pie()
+      .value(function(d) { return d.value; })
+      .sort(null);
+
+    return pieFunction(
+      this.get("groupedData")
+        .filter((value) => { return value.groupBy !== null; })
+    );
+  }),
+
+  pieFunction: computed(function() {
+     return d3.layout.pie()
+      .value(function(d) { return d.value; })
+      .sort(null);   
   }),
 
   plotHeight: computed("chartDivHeight", "margin", function(){
     return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
   }),
 
-  stackFunction: computed(function(){
-    return d3.layout.stack()
-      .values(function(d) { return d.values; });
+  plotWidth: computed("chartDivWidth", "margin", function(){
+    return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
+  }),  
+
+  radius: computed("plotHeight", "plotWidth", function(){
+    return Math.min(this.get("plotWidth"), this.get("plotHeight")) / 2;
   }),
 
   titleString: computed("data", function() {
@@ -79,78 +85,52 @@ export default Ember.Component.extend(Chart, {
     return spec.queryType +
       " " + spec.queryParams.targetProperty +
       " in " + spec.queryParams.eventCollection +
-      " by " + spec.queryParams.groupBy +
-      " " + spec.queryParams.interval +
-      " over " + spec.queryParams.timeframe;
+      " by " + spec.queryParams.groupBy;
   }),
-
-  xAxis: computed("formatDateDisplay", "nDays", "xScale", function() {
-    return d3.svg.axis()
-      .scale(this.get("xScale"))
-      .orient("bottom")
-      .ticks(this.get("nDays"))
-      .tickFormat(this.get("formatDateDisplay"))
-      .tickSubdivide(0);
-  }),
-
-  xScale: computed("data", "plotWidth", function() {
-    return d3.time.scale()
-      .domain(d3.extent(this.get("data").processed, function(d) { return d.date; }))
-      .range([0, this.get("plotWidth")]);
-  }),
-
-  yAxis: computed("formatCount", "yScale", function() {
-    return d3.svg.axis()
-      .scale(this.get("yScale"))
-      .orient("left")
-      .ticks(4)
-      .tickFormat(this.get("formatCount"))
-      .tickSubdivide(0);
-  }),
-
-  yScale: computed("data", "plotHeight", function() {
-    return d3.scale.linear()
-      .domain([0, d3.max(this.get("data").processed, function(d) { return d.total; })])
-      .range([this.get("plotHeight"), 0]);
-  }),
-
-  willInsertElement(){
-    this.set("chartDivHeight", 250);
-    this.set("xAxisRoom", 13);
-    this.set("yAxisRoom", 25);
-    this.set("legendRoom", 90);
-  },
 
   chartElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll(".group").data(this.get("groupedData"));   
+    return this.get("svg").selectAll("path.group").data(this.get("pieData"));
   },
 
-  chartEnter: function() {
+  chartEnter: function(){
+    // svg > g needs a different translate value from that given in Chart
+    // TODO refactor so that g is the responsibility of the individual chart type
+    // ... and this.get("svg") returns an svg, not a g
+    this.get("svg").attr(
+      "transform",
+      "translate(" +
+        (this.get("margin").left + this.get("plotWidth") / 2) +
+        ", " +
+        (this.get("margin").top + this.get("plotHeight") / 2) +
+        ")"
+    );
+
     var enterSelection = this.get("svg").selectAll("path.group")
-      .data(this.get("groupedData"))
-      .enter();   
+      .data(this.get("pieData"))
+      .enter();
 
     enterSelection.append("path")
       .attr("class", "group")
-      .attr("d", (d) => { return this.get("areaFunction")(d.values); })
-      .style("fill", (d) => { return this.get("colorScale")(d.groupBy); });
+      .attr("d", this.get("arcFunction"))
+      .style("fill", (d) => { return this.get("colorScale")(d.data.groupBy); });
 
     this.legendEnter();
   },
 
-  chartUpdate: function() {
+  chartUpdate: function(){
     this.chartEnter();
 
     var updateSelection = this.chartElements();
 
-    updateSelection.attr("d", (d) => { return this.get("areaFunction")(d.values); })
-      .style("fill", (d) => { return this.get("colorScale")(d.groupBy); });
+    updateSelection.attr("d", this.get("arcFunction"))
+      .style("fill", (d) => { return this.get("colorScale")(d.data.groupBy); });
 
     var exitSelection = updateSelection.exit();
-    exitSelection.remove();        
+    exitSelection.remove();
 
     this.legendUpdate();
+
   },
 
   legendElements: function() {
@@ -159,9 +139,10 @@ export default Ember.Component.extend(Chart, {
   },
 
   legendEnter: function() {
+
     var enterSelection = this.get("svg").selectAll(".legend")
       .data(this.get("groupedData"))
-      .enter();   
+      .enter();
 
     var legendGs = enterSelection.append("g")
       .attr("class", "legend")
@@ -195,12 +176,13 @@ export default Ember.Component.extend(Chart, {
   },
 
   legendUpdate: function() {
+
     var updateSelection = this.legendElements();
 
     updateSelection.attr("transform", (d, i) => {
         var legendEntryHeight = this.get("legendRectSize") + this.get("legendSpacing");
-        var offset = 0;
-        var horz = this.get("plotWidth") + 10;
+        var offset = legendEntryHeight * this.get("groups").length / 2;
+        var horz = (this.get("plotWidth") / 2) + 10;
         var vert = i * legendEntryHeight - offset;
         return "translate(" + horz + "," + vert + ")";
       });
@@ -226,6 +208,14 @@ export default Ember.Component.extend(Chart, {
       );
 
     var exitSelection = updateSelection.exit();
-    exitSelection.remove();
+    exitSelection.remove();        
+  },  
+
+  willInsertElement(){
+    this.set("chartDivHeight", 250);
+    this.set("xAxisRoom", 0);
+    this.set("yAxisRoom", 0);
+    this.set("legendRoom", 90);
   }
+
 });

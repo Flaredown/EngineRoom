@@ -67,6 +67,11 @@ export default Ember.Route.extend(HistogramMixin, {
             specs: specs,
             processed: query.result
           };
+        case "ring":
+          return {
+            specs: specs,
+            processed: query.result
+          };          
         default:
           throw "Unexpected chartType!";
       }

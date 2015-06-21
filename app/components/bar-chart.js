@@ -127,5 +127,5 @@ export default Ember.Component.extend(Chart, {
     this.set("xAxisRoom", 13);
     this.set("yAxisRoom", 78);
     this.set("legendRoom", 0);
-  },
+  }
 });

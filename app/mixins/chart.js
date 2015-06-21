@@ -75,17 +75,14 @@ export default Ember.Mixin.create({
   updateD3: function() {
     this.chartUpdate();
 
-    this.get("svg").selectAll(".x.axis")
-      .call(this.get("xAxis"));
+    this.updateXAxis(this.get("xAxis"));
 
-    this.get("svg").selectAll(".y.axis")
-      .call(this.get("yAxis"))
-    .selectAll(".tick text")
-      .call(this.truncate, this.get("yAxisRoom"), 0);      
+    this.updateYAxis(this.get("yAxis"));    
 
     this.drawTitle(this.get("titleString"), this.get("element"));
   },
 
+  // TODO decide if these take parameters or reference properties
   drawSvg: function(chartElement, plotWidth, plotHeight, margin) {
     d3.select(chartElement).append("svg")
         .attr("width", plotWidth + margin.left + margin.right)
@@ -98,17 +95,22 @@ export default Ember.Mixin.create({
     d3.select(element).select(".chart-title").text(titleString);
   },
 
+
   drawXAxis: function(axis, target, height) {
-    target.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0, " + height + ")")
-      .call(axis);
+    if (axis) {
+      target.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0, " + height + ")")
+        .call(axis);
+    }
   },
 
   drawYAxis: function(axis, target) {
-    target.append("g")
-      .attr("class", "y axis")
-      .call(axis);
+    if (axis) {
+      target.append("g")
+        .attr("class", "y axis")
+        .call(axis);
+    }
   },
 
   truncate: function(text, width, padding) {
@@ -122,5 +124,21 @@ export default Ember.Mixin.create({
         textLength = self.node().getComputedTextLength();
       }
     });
+  },
+
+  updateXAxis: function(axis){
+    if (axis) {
+      this.get("svg").selectAll(".x.axis")
+        .call(axis);
+    }
+  },
+
+  updateYAxis: function(axis){
+    if (axis) {
+    this.get("svg").selectAll(".y.axis")
+      .call(axis)      
+      .selectAll(".tick text")
+      .call(this.truncate, this.get("yAxisRoom"), 0); 
+    }
   }
 });

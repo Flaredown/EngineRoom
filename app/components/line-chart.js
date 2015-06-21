@@ -2,20 +2,6 @@ import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
 
-function _drawLine(data, xScale, yScale, target, color) {
-
-  var line = d3.svg.line()
-    .x(function(d) { return xScale(d.date); })
-    .y(function(d) { return yScale(d.value); });
-
-  target.append("path")
-    .datum(data)
-    .attr("class", "line")
-    .style("stroke", color)
-    .style("stroke-width", 2) // TODO handle in css?
-    .style("fill", "none")
-    .attr("d", line);
-}
 
 export default Ember.Component.extend(Chart, {
 

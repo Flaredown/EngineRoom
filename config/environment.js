@@ -71,6 +71,15 @@ module.exports = function(environment) {
               "groupBy": "user_agent.browser.name",
               "timeframe": "this_28_days",
               "interval": "daily"
+            },
+          },
+          {
+            "chartType": "ring",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "pageviews",
+              "targetProperty": "session_id",
+              "groupBy": "user_agent.browser.name"
             }
           }
         ]
