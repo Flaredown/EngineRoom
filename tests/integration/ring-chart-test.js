@@ -42,6 +42,19 @@ test("it draws arcs", function() {
   // TODO: test properties of the arcs themselves?
 });
 
+test("it draws labels in arcs", function() {
+  var processedData = component.get("data").processed;
+
+  var svg = component.$().find("svg");
+  var groups = svg.find(".group");
+  var groupLabels = groups.find("text");
+
+  var expectedGroupN = processedData.length;
+  equal(groupLabels.length, expectedGroupN, "right number of labels");
+
+  // TODO: test properties of the arcs themselves?
+});
+
 test("it doesn't draw axes", function() {
   var svg = component.$().find("svg");
   var xAxis = svg.find(".x");

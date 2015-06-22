@@ -3,6 +3,25 @@ import Chart from "../mixins/chart";
 var computed = Em.computed;
 
 
+function pointIsInArc(pt, ptData, d3Arc) {
+  // source: http://stackoverflow.com/a/19801529
+  // Center of the arc is assumed to be 0,0
+  // (pt.x, pt.y) are assumed to be relative to the center
+  var r1 = d3Arc.innerRadius()(ptData),
+      r2 = d3Arc.outerRadius()(ptData),
+      theta1 = d3Arc.startAngle()(ptData),
+      theta2 = d3Arc.endAngle()(ptData);
+  
+  var dist = pt.x * pt.x + pt.y * pt.y,
+      angle = Math.atan2(pt.x, -pt.y);
+  
+  angle = (angle < 0) ? (angle + Math.PI * 2) : angle;
+      
+  return (r1 * r1 <= dist) && (dist <= r2 * r2) && 
+         (theta1 <= angle) && (angle <= theta2);
+}
+
+
 export default Ember.Component.extend(Chart, {
 
   legendRectSize: 18,
@@ -93,13 +112,14 @@ export default Ember.Component.extend(Chart, {
 
   chartElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll("path.group").data(this.get("pieData"));
+    return this.get("svg").selectAll("g.group").data(this.get("pieData"));
   },
 
   chartEnter: function(){
     // svg > g needs a different translate value from that given in Chart
     // TODO refactor so that g is the responsibility of the individual chart type
     // ... and this.get("svg") returns an svg, not a g
+
     this.get("svg").attr(
       "transform",
       "translate(" +
@@ -109,14 +129,54 @@ export default Ember.Component.extend(Chart, {
         ")"
     );
 
-    var enterSelection = this.get("svg").selectAll("path.group")
+    var enterSelection = this.get("svg").selectAll("g.group")
       .data(this.get("pieData"))
       .enter();
 
-    enterSelection.append("path")
-      .attr("class", "group")
+    var groups = enterSelection.append("g")
+      .attr("class", "group");
+
+    groups.append("path")
       .attr("d", this.get("arcFunction"))
       .style("fill", (d) => { return this.get("colorScale")(d.data.groupBy); });
+
+    var arcFunction = this.get("arcFunction"); // needed for text function
+
+    groups.append("text")
+      .attr("transform", (d) => {
+        return "translate(" + this.get("arcFunction").centroid(d) + ")";
+      })
+      .attr("dy", ".35em")
+      .attr("class", "graph-label")
+      .text((d) => { return d.data.value; })
+        .each(function(d) {
+
+          var bb = this.getBBox(),  // can't use a fat-arrow function because then this != text
+              center = arcFunction.centroid(d);  
+               
+          var topLeft = {
+            x : center[0] + bb.x,
+            y : center[1] + bb.y
+          };  
+          var topRight = {
+            x : topLeft.x + bb.width,
+            y : topLeft.y
+          };
+          var bottomLeft = {
+            x : topLeft.x,
+            y : topLeft.y + bb.height
+          };
+          var bottomRight = {
+            x : topLeft.x + bb.width,
+            y : topLeft.y + bb.height
+          };
+           
+          d.visible = pointIsInArc(topLeft, d, arcFunction) &&
+                      pointIsInArc(topRight, d, arcFunction) &&
+                      pointIsInArc(bottomLeft, d, arcFunction) &&
+                      pointIsInArc(bottomRight, d, arcFunction);
+      })
+        .style("display", (d) => { return d.visible ? null : "none"; });
 
     this.legendEnter();
   },
@@ -126,8 +186,48 @@ export default Ember.Component.extend(Chart, {
 
     var updateSelection = this.chartElements();
 
-    updateSelection.attr("d", this.get("arcFunction"))
+    updateSelection.selectAll("path")
+      .attr("d", this.get("arcFunction"))
       .style("fill", (d) => { return this.get("colorScale")(d.data.groupBy); });
+
+    var arcFunction = this.get("arcFunction"); // needed for text function
+
+    updateSelection.selectAll("text")
+      .attr("transform", (d) => {
+        return "translate(" + this.get("arcFunction").centroid(d) + ")";
+      })
+      .attr("dy", ".35em")
+      .attr("class", "graph-label")
+      .text((d) => { return d.data.value; })
+      .style("display", "block")  // reset display temporarily so text.getBBox() gets bounding box
+        .each(function(d) {
+
+          var bb = this.getBBox(),  // can't use a fat-arrow function because then this != text
+              center = arcFunction.centroid(d);  
+               
+          var topLeft = {
+            x : center[0] + bb.x,
+            y : center[1] + bb.y
+          };  
+          var topRight = {
+            x : topLeft.x + bb.width,
+            y : topLeft.y
+          };
+          var bottomLeft = {
+            x : topLeft.x,
+            y : topLeft.y + bb.height
+          };
+          var bottomRight = {
+            x : topLeft.x + bb.width,
+            y : topLeft.y + bb.height
+          };
+           
+          d.visible = pointIsInArc(topLeft, d, arcFunction) &&
+                      pointIsInArc(topRight, d, arcFunction) &&
+                      pointIsInArc(bottomLeft, d, arcFunction) &&
+                      pointIsInArc(bottomRight, d, arcFunction);
+      })
+        .style("display", (d) => { return d.visible ? null : "none"; });
 
     var exitSelection = updateSelection.exit();
     exitSelection.remove();
