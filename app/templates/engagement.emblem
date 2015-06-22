@@ -1,7 +1,17 @@
-histogram-chart data=histoOne
-line-chart data=lineOne
-bar-chart data=barOne
-stacked-area-chart data=stackedAreaOne
-ring-chart data=ringOne
+.engine-room.application
+  .container
+    h3 KPI title
+    .row
+      .small-4.columns
+        histogram-chart data=histoOne
+      .small-4.columns        
+        line-chart data=lineOne
+      .small-4.columns
+        bar-chart data=barOne
+    .row
+      .small-8.columns
+        stacked-area-chart data=stackedAreaOne
+      .small-4.columns
+        ring-chart data=ringOne
 
 outlet
