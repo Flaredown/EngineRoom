@@ -78,6 +78,7 @@ export default Ember.Component.extend(Chart, {
       .value(function(d) { return d.value; })
       .sort(null);
 
+    // will it come back to bite us if we do the filtering here and not in groupedData?
     return pieFunction(
       this.get("groupedData")
         .filter((value) => { return value.groupBy !== null; })
@@ -108,6 +109,12 @@ export default Ember.Component.extend(Chart, {
       " " + spec.queryParams.targetProperty +
       " in " + spec.queryParams.eventCollection +
       " by " + spec.queryParams.groupBy;
+  }),
+
+  total: computed("groupedData", function() {
+    return this.get("groupedData")
+      .map((x) => { return x.value; })
+      .reduce((previousValue, currentValue) => { return previousValue + currentValue; });
   }),
 
   chartElements: function() {
@@ -148,7 +155,7 @@ export default Ember.Component.extend(Chart, {
       })
       .attr("dy", ".35em")
       .attr("class", "graph-label")
-      .text((d) => { return d.data.value; })
+      .text((d) => { return this.formatPercentage(d.data.value, this.get("total")); })
         .each(function(d) {
 
           var bb = this.getBBox(),  // can't use a fat-arrow function because then this != text
@@ -198,7 +205,7 @@ export default Ember.Component.extend(Chart, {
       })
       .attr("dy", ".35em")
       .attr("class", "graph-label")
-      .text((d) => { return d.data.value; })
+      .text((d) => { return this.formatPercentage(d.data.value, this.get("total")); })
       .style("display", "block")  // reset display temporarily so text.getBBox() gets bounding box
         .each(function(d) {
 

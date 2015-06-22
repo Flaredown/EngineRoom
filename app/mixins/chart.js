@@ -113,6 +113,10 @@ export default Ember.Mixin.create({
     }
   },
 
+  formatPercentage: function(n, total) {
+    return Math.round(100 * n / total).toString() + "%";
+  },
+
   truncate: function(text, width, padding) {
     text.each(function() {
       var self = d3.select(this),

@@ -52,7 +52,16 @@ test("it draws labels in arcs", function() {
   var expectedGroupN = processedData.length;
   equal(groupLabels.length, expectedGroupN, "right number of labels");
 
-  // TODO: test properties of the arcs themselves?
+  // TODO: test properties of the labels?
+});
+
+test("it formats arc labels correctly", function() {
+  var svg = component.$().find("svg");
+  var groups = svg.find(".group");
+  var groupLabels = groups.find("text");
+
+  var expectedLabel = "6%";  // fragile, depends on fixture
+  equal(groupLabels[0].textContent, expectedLabel);
 });
 
 test("it doesn't draw axes", function() {
@@ -110,6 +119,10 @@ test("it updates the chart based on changes in data", function() {
     "updates to a large dataset: groups"
   );
 
+  equal(svg.find(".group text").length, component.get("data").processed.length,
+    "updates to a large dataset: group labels"
+  );
+
   equal(svg.find(".legend").length, component.get("data").processed.length,
     "updates to a large dataset: legend"
   );
@@ -119,6 +132,10 @@ test("it updates the chart based on changes in data", function() {
   equal(svg.find(".group").length, component.get("data").processed.length,
     "updates to a small dataset: groups"
   );
+
+  equal(svg.find(".group text").length, component.get("data").processed.length,
+    "updates to a small dataset: group labels"
+  );  
 
   equal(svg.find(".legend").length, component.get("data").processed.length,
     "updates to a small dataset: legend"
