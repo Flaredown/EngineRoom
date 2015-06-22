@@ -30,6 +30,10 @@ export default Ember.Component.extend(Chart, {
       .range(this.get("colorPalette"));
   }),
 
+  groupBy: computed("data", function() {
+    return this.get("data").specs.queryParams.groupBy;
+  }),
+
   groupedData: computed("data", "groups", function(){
     var _data = this.get("data").processed;
 
@@ -41,9 +45,9 @@ export default Ember.Component.extend(Chart, {
     });
   }),
 
-  groups: computed("data", function() {
+  groups: computed("data", "groupBy", function() {
     return this.get("data").processed.map((d) => {
-      return d.name;
+      return d[this.get("groupBy")];
     });
   }),
 
