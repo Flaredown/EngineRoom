@@ -13,13 +13,13 @@ module.exports = function(environment) {
       }
     },
     contentSecurityPolicy: {
-      'default-src': "*",
-      'script-src': "*",
-      'font-src': "*",
-      'connect-src': "*",
-      'img-src': "*",
-      'style-src': "*",
-      'frame-src': "*"
+      "default-src": "*",
+      "script-src": "*",
+      "font-src": "*",
+      "connect-src": "*",
+      "img-src": "*",
+      "style-src": "*",
+      "frame-src": "*"
     },
     // contentSecurityPolicy: {
     //   'default-src': "'self'",
