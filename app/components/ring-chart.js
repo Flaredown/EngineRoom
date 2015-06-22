@@ -36,7 +36,6 @@ export default Ember.Component.extend(Chart, {
 
   groupedData: computed("data", "groups", function(){
     var _data = this.get("data").processed;
-
     return this.get("groups").map((name) => {
       return {
         groupBy: name,
