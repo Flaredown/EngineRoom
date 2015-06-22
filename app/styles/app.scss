@@ -1,29 +1,33 @@
+@import "settings";
+
+@import "foundation";
+
 /*
  * Full-page application style
  */
 
 $helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
 
-.keen.application {
+.engine-room.application {
   background: #f2f2f2;
   padding: 60px 20px 0;
   line-height: 1.2;
   font-family: $helvetica-neue-stack;
 }
-.keen.application > .container {
+.engine-room.application > .container {
   padding-left: 0;
   padding-right: 0;
 }
-.keen.application div[class="columns"] {
+.engine-room.application div[class="columns"] {
   padding-left: 5px;
   padding-right: 5px;
 }
-.keen.application div[class="columns"] div[class="columns"] {
+.engine-room.application div[class="columns"] div[class="columns"] {
   padding-left: 15px;
   padding-right: 15px;
 }
 
-.keen.application hr {
+.engine-room.application hr {
   border-color: #d7d7d7;
   margin: 10px 0;
 }
@@ -82,7 +86,14 @@ $helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
   text-anchor: middle;
 }
 
-.group path {
+path.group {
   stroke: #fff;
   stroke-width: 0.3;
 }
+
+path.line {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: butt;
+}
+

@@ -92,9 +92,7 @@ export default Ember.Component.extend(Chart, {
 
     enterSelection.append("path")
       .attr("class", "line")
-      .style("stroke", this.get("colorPalette"))
-      .style("stroke-width", 2) // TODO handle in css?
-      .style("fill", "none");
+      .style("stroke", this.get("colorPalette"));
 
     updateSelection.attr("d", this.get("lineFunction"));
     
@@ -107,9 +105,7 @@ export default Ember.Component.extend(Chart, {
 
     updateSelection.attr("d", this.get("lineFunction"))
       .attr("class", "line")
-      .style("stroke", this.get("colorPalette")[0])
-      .style("stroke-width", 2) // TODO handle in css?
-      .style("fill", "none");
+      .style("stroke", this.get("colorPalette")[0]);
 
     var exitSelection = updateSelection.exit();
     exitSelection.remove(); 

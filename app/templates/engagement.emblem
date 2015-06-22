@@ -1,17 +1,16 @@
 .engine-room.application
   .container
     h3 KPI title
-    .row
-      .small-4.columns
+    ul.small-block-grid-1.medium-block-grid-2.large-block-grid-3
+      li
         histogram-chart data=histoOne
-      .small-4.columns        
+      li    
         line-chart data=lineOne
-      .small-4.columns
+      li
         bar-chart data=barOne
-    .row
-      .small-8.columns
+      li
         stacked-area-chart data=stackedAreaOne
-      .small-4.columns
+      li
         ring-chart data=ringOne
 
 outlet
