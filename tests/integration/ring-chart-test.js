@@ -79,7 +79,7 @@ test("legend labels are truncated", function() {
   var legendLabels = svg.find(".legend text");
   var longLabel = component.get("groups")[5];  // fragile, depends on fixture
 
-  var magicNumber = 8;  // fragile, depends on component.yAxisRoom and axis label text
+  var magicNumber = 10;  // fragile, depends on component.yAxisRoom and axis label text
   var expectedTruncation = longLabel.slice(0, magicNumber) + "...";
 
   equal(legendLabels[5].textContent, expectedTruncation);

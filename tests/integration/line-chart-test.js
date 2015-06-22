@@ -43,7 +43,7 @@ test("it draws a line", function() {
   var expectedSegmentCount = processedData.length;
   equal(segments.length, expectedSegmentCount, "draws the right number of segments");
 
-  var expectedSegmentX = 998;  // fragile, based on fixture and div width/height
+  var expectedSegmentX = 994;  // fragile, based on fixture and div width/height
   var expectedSegmentY = 12;  // fragile, based on fixture and div width/height
 
   equal(Math.round(segments[5].x), expectedSegmentX, "segments go in the right place: x"); 

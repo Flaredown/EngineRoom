@@ -50,7 +50,7 @@ test("it draws the bars to the right width", function() {
   var bars = svg.find(".bar");
   var barWidth = parseInt(bars.first().attr("width"));
 
-  var expectedBarWidth = 1154;  // fragile, depends on fixture and chart width
+  var expectedBarWidth = 1150;  // fragile, depends on fixture and chart width
 
   equal(barWidth, expectedBarWidth);
 });
@@ -78,7 +78,7 @@ test("it truncates long y-axis labels", function() {
   var yAxis = component.$().find(".y");
   var yAxisLabels = yAxis.find("text");
 
-  var magicNumber = 13;  // fragile, depends on component.yAxisRoom and axis label text
+  var magicNumber = 12;  // fragile, depends on component.yAxisRoom and axis label text
   var expectedTruncation = longLabel.slice(0, magicNumber) + "...";
 
   equal(yAxisLabels[0].textContent, expectedTruncation);
