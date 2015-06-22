@@ -2,11 +2,12 @@
 
 @import "foundation";
 
+$helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+
+
 /*
  * Full-page application style
  */
-
-$helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
 
 .engine-room.application {
   background: #f2f2f2;
@@ -30,6 +31,14 @@ $helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
 .engine-room.application hr {
   border-color: #d7d7d7;
   margin: 10px 0;
+}
+
+.engine-room.application h3 {
+  color: #484848;
+  font-weight: 700;
+  line-height: 1em;
+  margin: 0 0 1em 0;
+  text-transform: uppercase;
 }
 
 .return-link, .return-link:focus, .return-link:hover {
