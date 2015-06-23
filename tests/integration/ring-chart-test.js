@@ -49,7 +49,7 @@ test("it draws labels in arcs", function() {
   var groups = svg.find(".group");
   var groupLabels = groups.find("text");
 
-  var expectedGroupN = processedData.length;
+  var expectedGroupN = processedData[0].value.length;
   equal(groupLabels.length, expectedGroupN, "right number of labels");
 
   // TODO: test properties of the labels?
@@ -60,7 +60,7 @@ test("it formats arc labels correctly", function() {
   var groups = svg.find(".group");
   var groupLabels = groups.find("text");
 
-  var expectedLabel = "6%";  // fragile, depends on fixture
+  var expectedLabel = "52%";  // fragile, depends on fixture
   equal(groupLabels[0].textContent, expectedLabel);
 });
 
@@ -85,7 +85,7 @@ test("it draws a legend", function() {
   var svg = component.$().find("svg");
   var legendEntries = svg.find(".legend");
 
-  var expectedLegendEntryN = processedData.length;
+  var expectedLegendEntryN = processedData[0].value.length;
   equal(legendEntries.length, expectedLegendEntryN);
 
   var legendRects = svg.find(".legend rect");
@@ -99,12 +99,12 @@ test("it draws a legend", function() {
 test("legend labels are truncated", function() {
   var svg = component.$().find("svg");
   var legendLabels = svg.find(".legend text");
-  var longLabel = component.get("groups")[5];  // fragile, depends on fixture
+  var longLabel = component.get("groups")[6];  // fragile, depends on fixture
 
   var magicNumber = 10;  // fragile, depends on component.yAxisRoom and axis label text
   var expectedTruncation = longLabel.slice(0, magicNumber) + "...";
 
-  equal(legendLabels[5].textContent, expectedTruncation);
+  equal(legendLabels[6].textContent, expectedTruncation);
 
 });
 
@@ -115,29 +115,29 @@ test("it updates the chart based on changes in data", function() {
 
   this.subject().set("data", ringChartFixture().large);
 
-  equal(svg.find(".group").length, component.get("data").processed.length,
+  equal(svg.find(".group").length, component.get("data").processed[0].value.length,
     "updates to a large dataset: groups"
   );
 
-  equal(svg.find(".group text").length, component.get("data").processed.length,
+  equal(svg.find(".group text").length, component.get("data").processed[0].value.length,
     "updates to a large dataset: group labels"
   );
 
-  equal(svg.find(".legend").length, component.get("data").processed.length,
+  equal(svg.find(".legend").length, component.get("data").processed[0].value.length,
     "updates to a large dataset: legend"
   );
 
   this.subject().set("data", ringChartFixture().small);
 
-  equal(svg.find(".group").length, component.get("data").processed.length,
+  equal(svg.find(".group").length, component.get("data").processed[0].value.length,
     "updates to a small dataset: groups"
   );
 
-  equal(svg.find(".group text").length, component.get("data").processed.length,
+  equal(svg.find(".group text").length, component.get("data").processed[0].value.length,
     "updates to a small dataset: group labels"
   );  
 
-  equal(svg.find(".legend").length, component.get("data").processed.length,
+  equal(svg.find(".legend").length, component.get("data").processed[0].value.length,
     "updates to a small dataset: legend"
   );  
 });

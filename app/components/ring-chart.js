@@ -69,7 +69,7 @@ export default Ember.Component.extend(Chart, {
 
 
   // TODO move some or all of this into route
-  groupedData: computed("data", "groups", function() {
+  groupedData: computed("data", "formatDateKeen", "groupBy", "timeframeStart", "timeframeEnd", function() {
     var _data = this.get("data").processed;
 
     // TODO combine this date stuff
