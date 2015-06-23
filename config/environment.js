@@ -84,6 +84,7 @@ module.exports = function(environment) {
               "eventCollection": "pageviews",
               "targetProperty": "session_id",
               "groupBy": "user_agent.browser.name",
+              "interval": "daily"
             }
           }
         ]

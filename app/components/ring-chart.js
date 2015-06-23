@@ -67,21 +67,37 @@ export default Ember.Component.extend(Chart, {
     return this.get("data").specs.queryParams.groupBy;
   }),
 
+
+  // TODO move some or all of this into route
   groupedData: computed("data", "groups", function() {
     var _data = this.get("data").processed;
 
-    // NEXT return raw data with timestamp and process here
+    // TODO combine this date stuff
+    _data.forEach((d) => {
+      d.date = this.get("formatDateKeen").parse(d.timeframe.start);
+    });
+    _data = this.filterByDate(_data, this.get("timeframeStart"), this.get("timeframeEnd"));
 
-    return this.get("groups").map((name) => {
+    var _groupedData = _data[0].value.map((col, i) => { 
       return {
-        groupBy: name,
-        value: _data.map((d) => { return d.result; })[this.get("groups").indexOf(name)]
+        value: _data.map((row) => {
+            return row.value[i].result;
+          })
+          .reduce((previousValue, currentValue) => {
+            return previousValue + currentValue;
+          }),
+        groupBy: col[this.get("groupBy")]
       };
     });
+
+    return _groupedData;
   }),
 
   groups: computed("data", "groupBy", function() {
-    return this.get("data").processed.map((d) => {
+
+    var firstDay = this.get("data").processed[0].value;
+
+    return firstDay.map((d) => {
       return d[this.get("groupBy")];
     });
   }),
