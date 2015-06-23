@@ -7,10 +7,15 @@ export default Ember.Route.extend(HistogramMixin, {
   keenQuerying: Ember.inject.service(),
   config: config.KPI.engagement,
 
+  constructQuery: function(metric) {
+    metric.queryParams.timeframe = this.config.filters.timeframe;
+    return new Keen.Query(metric.queryType, metric.queryParams);
+  },
+
   model() {
 
-    var keenQueries = this.get("config").metrics.map(function(metric) {
-      return new Keen.Query(metric.queryType, metric.queryParams);
+    var keenQueries = this.get("config").metrics.map((metric) => {
+      return this.constructQuery(metric);
     });
 
     var zip = function(arrays) {

@@ -33,6 +33,9 @@ module.exports = function(environment) {
 
     KPI: {
       "engagement": {
+        "filters": {
+          "timeframe": "this_28_days"
+        },
         "metrics": [
           {
             "chartType": "histogram",
@@ -40,7 +43,7 @@ module.exports = function(environment) {
             "queryParams": {
               "eventCollection": "entries",
               "targetProperty": "user_id",
-              "groupBy": "n_conditions"
+              "groupBy": "n_conditions",
             }
           },
           {
@@ -49,7 +52,6 @@ module.exports = function(environment) {
             "queryParams": {
               "eventCollection": "entries",
               "targetProperty": "user_id",
-              "timeframe": "this_28_days",
               "interval": "daily"
             }
           },
@@ -59,7 +61,7 @@ module.exports = function(environment) {
             "queryParams": {
               "eventCollection": "conditions",
               "targetProperty": "user_id",
-              "groupBy": "name"
+              "groupBy": "name",
             }
           },
           {
@@ -69,7 +71,6 @@ module.exports = function(environment) {
               "eventCollection": "pageviews",
               "targetProperty": "session_id",
               "groupBy": "user_agent.browser.name",
-              "timeframe": "this_28_days",
               "interval": "daily"
             },
           },
@@ -79,7 +80,7 @@ module.exports = function(environment) {
             "queryParams": {
               "eventCollection": "pageviews",
               "targetProperty": "session_id",
-              "groupBy": "user_agent.browser.name"
+              "groupBy": "user_agent.browser.name",
             }
           }
         ]
