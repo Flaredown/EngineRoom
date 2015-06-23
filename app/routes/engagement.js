@@ -8,7 +8,12 @@ export default Ember.Route.extend(HistogramMixin, {
   config: config.KPI.engagement,
 
   constructQuery: function(metric) {
-    metric.queryParams.timeframe = this.config.filters.timeframe;
+    metric.queryParams.timeframe = this.get("config").filters.timeframe;
+
+    var endDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ")(new Date());  // format Time.now for keen
+    metric.queryParams.timeframe.end = endDate;
+
+    Ember.assert("must supply timeframe end", Ember.isPresent(metric.queryParams.timeframe.end));
     return new Keen.Query(metric.queryType, metric.queryParams);
   },
 
