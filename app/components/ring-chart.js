@@ -26,6 +26,8 @@ export default Ember.Component.extend(Chart, {
 
   legendRectSize: 18,
   legendSpacing: 4,
+  timeframeStart: new Date(2015, 4, 1),  // TODO move to chart?
+  timeframeEnd: new Date(),  // TODO move to chart?  
   xAxis: null,  // TODO: is this the right way to handle not needing axes?
   yAxis: null,
 
@@ -49,12 +51,27 @@ export default Ember.Component.extend(Chart, {
       .range(this.get("colorPalette"));
   }),
 
+  finalData: computed("groupedData", function() {
+    var pieFunction = d3.layout.pie()
+      .value(function(d) { return d.value; })
+      .sort(null);
+
+    // will it come back to bite us if we do the filtering here and not in groupedData?
+    return pieFunction(
+      this.get("groupedData").filter((value) => { return value.groupBy !== null; })
+    );
+
+  }),
+
   groupBy: computed("data", function() {
     return this.get("data").specs.queryParams.groupBy;
   }),
 
-  groupedData: computed("data", "groups", function(){
+  groupedData: computed("data", "groups", function() {
     var _data = this.get("data").processed;
+
+    // NEXT return raw data with timestamp and process here
+
     return this.get("groups").map((name) => {
       return {
         groupBy: name,
@@ -71,18 +88,6 @@ export default Ember.Component.extend(Chart, {
 
   holeWidth: computed("radius", function() {
     return this.get("radius") / 2;
-  }),
-
-  pieData: computed("groupedData", function() {
-    var pieFunction = d3.layout.pie()
-      .value(function(d) { return d.value; })
-      .sort(null);
-
-    // will it come back to bite us if we do the filtering here and not in groupedData?
-    return pieFunction(
-      this.get("groupedData")
-        .filter((value) => { return value.groupBy !== null; })
-    );
   }),
 
   pieFunction: computed(function() {
@@ -119,7 +124,7 @@ export default Ember.Component.extend(Chart, {
 
   chartElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll("g.group").data(this.get("pieData"));
+    return this.get("svg").selectAll("g.group").data(this.get("finalData"));
   },
 
   chartEnter: function(){
@@ -137,7 +142,7 @@ export default Ember.Component.extend(Chart, {
     );
 
     var enterSelection = this.get("svg").selectAll("g.group")
-      .data(this.get("pieData"))
+      .data(this.get("finalData"))
       .enter();
 
     var groups = enterSelection.append("g")
