@@ -5,8 +5,11 @@ var computed = Em.computed;
 
 export default Ember.Component.extend(Chart, {
 
+  nDays: 4,  // TODO: unhardcode
   legendRectSize: 18,
   legendSpacing: 4,
+  timeframeStart: new Date(2015, 4, 1),  // TODO move to chart?
+  timeframeEnd: new Date(),  // TODO move to chart?
 
   areaFunction: computed("xScale", "yScale", function() {
     return d3.svg.area()
@@ -29,30 +32,35 @@ export default Ember.Component.extend(Chart, {
       .range(this.get("colorPalette"));
   }),
 
-  groupBy: computed("data", function() {
-    return this.get("data").specs.queryParams.groupBy;
+  finalData: computed(
+    "colorScale", "data", "formatDateKeen", "groups", "stackFunction", "timeframeStart", "timeframeEnd",
+    function() {
+      var _data = this.get("data").processed;
+
+      _data.forEach((d) => {
+        d.date = this.get("formatDateKeen").parse(d.timeframe.start);
+        d.total = d.value
+          .map(function(x) { return x.result; })
+          .reduce(function(previousValue, currentValue) {
+            return previousValue + currentValue;
+          });
+      });
+
+      _data = this.filterByDate(_data, this.get("timeframeStart"), this.get("timeframeEnd"));
+
+      return this.get("stackFunction")(this.get("colorScale").domain().map((name) => {
+        return {
+          groupBy: name,
+          values: _data.map((d) => {
+            return { date: d.date, y: d.value[this.get("groups").indexOf(name)].result };
+          })
+        };
+      }));
   }),
 
-  groupedData: computed("colorScale", "data", "formatDateKeen", "groups", "stackFunction", function(){
-    var _data = this.get("data").processed;
 
-    _data.forEach((d) => {
-      d.date = this.get("formatDateKeen").parse(d.timeframe.start);
-      d.total = d.value
-        .map(function(x) { return x.result; })
-        .reduce(function(previousValue, currentValue) {
-          return previousValue + currentValue;
-        });
-    });
-
-    return this.get("stackFunction")(this.get("colorScale").domain().map((name) => {
-      return {
-        groupBy: name,
-        values: _data.map((d) => {
-          return { date: d.date, y: d.value[this.get("groups").indexOf(name)].result };
-        })
-      };
-    }));
+  groupBy: computed("data", function() {
+    return this.get("data").specs.queryParams.groupBy;
   }),
 
   groups: computed("data", "groupBy", function() {
@@ -123,12 +131,12 @@ export default Ember.Component.extend(Chart, {
 
   chartElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll(".group").data(this.get("groupedData"));   
+    return this.get("svg").selectAll(".group").data(this.get("finalData"));   
   },
 
   chartEnter: function() {
     var enterSelection = this.get("svg").selectAll("path.group")
-      .data(this.get("groupedData"))
+      .data(this.get("finalData"))
       .enter();   
 
     enterSelection.append("path")
@@ -155,12 +163,12 @@ export default Ember.Component.extend(Chart, {
 
   legendElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll(".legend").data(this.get("groupedData"));       
+    return this.get("svg").selectAll(".legend").data(this.get("finalData"));       
   },
 
   legendEnter: function() {
     var enterSelection = this.get("svg").selectAll(".legend")
-      .data(this.get("groupedData"))
+      .data(this.get("finalData"))
       .enter();   
 
     var legendGs = enterSelection.append("g")

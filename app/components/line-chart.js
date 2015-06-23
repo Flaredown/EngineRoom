@@ -5,7 +5,7 @@ var computed = Em.computed;
 
 export default Ember.Component.extend(Chart, {
 
-  nDays: 21,  // TODO: unhardcode
+  nDays: 4,  // TODO: unhardcode
   timeframeStart: new Date(2015, 4, 1),
   timeframeEnd: new Date(),
 
@@ -21,6 +21,19 @@ export default Ember.Component.extend(Chart, {
     return d3.scale.ordinal().range(this.get("colorPalette"));
   }),
 
+  finalData: computed("data", "formatDateKeen", "timeframeStart", "timeframeEnd", function() {
+    var _data = this.get("data").processed.map((d) => {
+      d.date = this.get("formatDateKeen").parse(d.timeframe.start);
+      return d;
+    });
+
+    return this.filterByDate(
+      _data,
+      this.get("timeframeStart"),
+      this.get("timeframeEnd")
+    );
+  }), 
+
   lineFunction: computed("xScale", "yScale", function(){
     return d3.svg.line()
       .x((d) => { return this.get("xScale")(d.date); })
@@ -34,19 +47,6 @@ export default Ember.Component.extend(Chart, {
   plotHeight: computed("chartDivHeight", "margin", function() {
     return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
   }),
-
-  timestampedData: computed("data", "formatDateKeen", "timeframeStart", "timeframeEnd", function() {
-    var _timestampedData = this.get("data").processed.map((d) => {
-      d.date = this.get("formatDateKeen").parse(d.timeframe.start);
-      return d;
-    });
-
-    return this.filterByDate(
-      _timestampedData,
-      this.get("timeframeStart"),
-      this.get("timeframeEnd")
-    );
-  }), 
 
   titleString: computed("data", function() {
     var spec = this.get("data").specs;
@@ -66,9 +66,9 @@ export default Ember.Component.extend(Chart, {
       .tickSubdivide(0);
   }),
 
-  xScale: computed("paddingRight", "plotWidth", "timestampedData", function() {
+  xScale: computed("paddingRight", "plotWidth", "finalData", function() {
     return d3.time.scale()
-      .domain(d3.extent(this.get("timestampedData"), function(d) { return d.date; }))
+      .domain(d3.extent(this.get("finalData"), function(d) { return d.date; }))
       .range([0, this.get("plotWidth") - this.get("paddingRight")]);
   }),
 
@@ -81,21 +81,21 @@ export default Ember.Component.extend(Chart, {
       .tickSubdivide(0);
   }),
 
-  yScale: computed("paddingTop", "plotHeight", "timestampedData", function() {
+  yScale: computed("paddingTop", "plotHeight", "finalData", function() {
     return d3.scale.linear()
-      .domain([0, d3.max(this.get("timestampedData"), function(d) { return d.value; })])
+      .domain([0, d3.max(this.get("finalData"), function(d) { return d.value; })])
       .range([this.get("plotHeight"), 0 + this.get("paddingTop")]);
   }),
 
   chartElements: function(){
     // this returns the update selection
     // note that data is wrapped in an array: this is to get joins to work with line graphs
-    return this.get("svg").selectAll(".line").data([this.get("timestampedData")]);    
+    return this.get("svg").selectAll(".line").data([this.get("finalData")]);    
   },
 
   chartEnter: function(){
     var updateSelection = this.get("svg").selectAll(".line")
-      .data([this.get("timestampedData")]);
+      .data([this.get("finalData")]);
     var enterSelection = updateSelection.enter();
 
     enterSelection.append("path")
