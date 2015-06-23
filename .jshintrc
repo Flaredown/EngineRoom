@@ -12,7 +12,17 @@
   "eqeqeq": true,
   "evil": true,
   "forin": false,
+  "globals": {
+    "d3": false,
+    "Em": false,
+    "Ember": false,
+    "equal": false,
+    "Keen": false,
+    "ok": false,
+    "SVGPathSeg": false
+  },
   "immed": false,
+  "jquery": true,
   "laxbreak": false,
   "newcap": true,
   "noarg": true,

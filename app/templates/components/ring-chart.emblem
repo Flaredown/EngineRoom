@@ -1,0 +1,8 @@
+.chart-wrapper
+  .chart-title
+    | Some crazy ring chart!
+  .chart-stage
+    .chart
+      /! <img data-src="holder.js/100%x120/white"
+  .chart-notes
+    | bla!

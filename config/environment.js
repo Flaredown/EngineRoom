@@ -2,14 +2,87 @@
 
 module.exports = function(environment) {
   var ENV = {
-    modulePrefix: 'engine-room',
+    modulePrefix: "engine-room",
     environment: environment,
-    baseURL: '/',
-    locationType: 'auto',
+    baseURL: "/",
+    locationType: "auto",
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. 'with-controller': true
+      }
+    },
+    contentSecurityPolicy: {
+      "default-src": "*",
+      "script-src": "*",
+      "font-src": "*",
+      "connect-src": "*",
+      "img-src": "*",
+      "style-src": "*",
+      "frame-src": "*"
+    },
+    // contentSecurityPolicy: {
+    //   'default-src': "'self'",
+    //   'script-src': "'self' 'unsafe-inline' 'unsafe-eval' http://*.pusher.com www.google-analytics.com/analytics.js https://*.intercom.io https://*.intercomcdn.com www.google.com/jsapi d26b395fwzu5fz.cloudfront.net api.keen.io cdn.ravenjs.com www.telize.com",
+    //   'font-src': "'self'",
+    //   'connect-src': "`self` http://localhost:* ws://*.pusherapp.com http://*.pusher.com wss://*.intercom.io https://*.intercom.io ",
+    //   'img-src': "'self' www.google-analytics.com data: app.getsentry.com https://*.intercomcdn.com",
+    //   'style-src': "'self' 'unsafe-inline'",
+    //   'frame-src': ""
+    // },
+
+    KPI: {
+      "engagement": {
+        "metrics": [
+          {
+            "chartType": "histogram",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "user_id",
+              "groupBy": "n_conditions"
+            }
+          },
+          {
+            "chartType": "line",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "user_id",
+              "timeframe": "this_28_days",
+              "interval": "daily"
+            }
+          },
+          {
+            "chartType": "bar",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "conditions",
+              "targetProperty": "user_id",
+              "groupBy": "name"
+            }
+          },
+          {
+            "chartType": "stackedArea",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "pageviews",
+              "targetProperty": "session_id",
+              "groupBy": "user_agent.browser.name",
+              "timeframe": "this_28_days",
+              "interval": "daily"
+            },
+          },
+          {
+            "chartType": "ring",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "pageviews",
+              "targetProperty": "session_id",
+              "groupBy": "user_agent.browser.name"
+            }
+          }
+        ]
       }
     },
 
@@ -19,7 +92,7 @@ module.exports = function(environment) {
     }
   };
 
-  if (environment === 'development') {
+  if (environment === "development") {
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;
@@ -27,19 +100,19 @@ module.exports = function(environment) {
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
   }
 
-  if (environment === 'test') {
+  if (environment === "test") {
     // Testem prefers this...
-    ENV.baseURL = '/';
-    ENV.locationType = 'none';
+    ENV.baseURL = "/";
+    ENV.locationType = "none";
 
     // keep test console output quieter
     ENV.APP.LOG_ACTIVE_GENERATION = false;
     ENV.APP.LOG_VIEW_LOOKUPS = false;
 
-    ENV.APP.rootElement = '#ember-testing';
+    ENV.APP.rootElement = "#ember-testing";
   }
 
-  if (environment === 'production') {
+  if (environment === "production") {
 
   }
 

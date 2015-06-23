@@ -1,100 +1,125 @@
 import Ember from "ember";
+import Chart from "../mixins/chart";
 var computed = Em.computed;
 
-export default Ember.Component.extend({
+// TODO change all this.get("function") where it's not a computed property to this.function (in other files)
+
+export default Ember.Component.extend(Chart, {
+
+  binnedData: computed("data", "nBins", "xScale", function() {
+    return d3.layout.histogram()
+      .bins(this.get("xScale").ticks(this.get("nBins")))
+      (this.get("data.processed"));
+  }),
+
+  // TODO make this a for real computed property -- propertyDidChange("chartDivWidth")
+  chartDivWidth: computed("chartElement", function() {
+    return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
+  }),
 
   chartElement: computed("elementId", function() {
     return "#" + this.get("elementId") + " .chart";
   }),
-  didInsertElement(){
 
-    var flaredownColors = [
-      "#ECC916", "#F58A5A", "#D15423",
-      "#D47C87", "#C01E55", "#DB9126",
-      "#B83B8A", "#ED80B2", "#F27071",
-      "#F7A8A8"
-    ];
+  colorScale: computed("colorPalette", function() {
+    return d3.scale.ordinal().range(this.get("colorPalette"));
+  }),
 
-    var MARGIN_BASE = 12;
+  maxValue: computed("data", function() {
+    return Math.max.apply(null, this.get("data").processed);
+  }),
 
-    var color = d3.scale.ordinal()
-      .range(flaredownColors);
-    
-    var maxValue = Math.max.apply(null, this.get("data").melted);
+  nBins: computed("maxValue", "plotWidth", function() {
+    return Math.min(this.get("maxValue") + 1, this.get("plotWidth") / 20);
+  }),
 
-    var formatCount = d3.format("d");
+  plotWidth: computed("chartDivWidth", "margin", function(){
+    return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
+  }),
 
-    // TODO right margin isn't looking correct, is it?
-    var chartWidth = parseInt(d3.select(this.get("element")).style('width'), 10);
-    var chartHeight = 250;
+  plotHeight: computed("chartDivHeight", "margin", function(){
+    return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
+  }),
 
-    var xAxisRoom = 13;
-    var yAxisRoom = 20;
+  titleString: computed("data", function() {
+    var spec = this.get("data").specs;
+    return spec.queryType +
+      " " + spec.queryParams.targetProperty +
+      " in " + spec.queryParams.eventCollection +
+      " by " + spec.queryParams.groupBy;
+  }),
 
-    var margin = {
-      top: MARGIN_BASE,
-      right: MARGIN_BASE,
-      bottom: MARGIN_BASE + xAxisRoom,
-      left: MARGIN_BASE + yAxisRoom
-    };
+  xAxis: computed("nBins", "xScale", function() {
+    return d3.svg.axis()
+      .scale(this.get("xScale"))
+      .orient("bottom")
+      .ticks(this.get("nBins"));
+  }),
 
-    var width = chartWidth - margin.left - margin.right,
-        height = chartHeight - margin.top - margin.bottom;
+  xScale: computed("maxValue", "paddingRight", "plotWidth", function() {
+    return d3.scale.linear()
+      .domain([0, this.get("maxValue") + 1])
+      .range([0, this.get("plotWidth") - this.get("paddingRight")]);
+  }),
 
-    var nBins = Math.min(maxValue + 1, width / 20);
+  yAxis: computed("formatCount", "yScale", function(){
+    return d3.svg.axis()
+      .scale(this.get("yScale"))
+      .orient("left")
+      .ticks(4)
+      .tickFormat(this.get("formatCount"))
+      .tickSubdivide(0);  
+  }),
 
-    var x = d3.scale.linear()
-        .domain([0, maxValue + 1])
-        .range([0, width]);
+  yScale: computed("binnedData", "paddingTop", "plotHeight", function() {
+    return d3.scale.linear()
+      .domain([0, d3.max(this.get("binnedData"), function(d) { return d.y; })])
+      .range([this.get("plotHeight"), 0 + this.get("paddingTop")]);
+  }),
 
-    // Generate a histogram using n uniformly-spaced bins.
-    var data = d3.layout.histogram()
-        .bins(x.ticks(nBins))
-        (this.get("data").melted);
+  chartElements: function() {
+    // this returns the update selection
+    return this.get("svg").selectAll(".bar").data(this.get("binnedData"));
+  },
 
-    var y = d3.scale.linear()
-        .domain([0, d3.max(data, function(d) { return d.y; })])
-        .range([height, 0]);
+  chartEnter: function() {
+    var enterSelection = this.get("svg").selectAll("rect.bar")
+      .data(this.get("binnedData"))
+      .enter();
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .ticks(nBins);
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .ticks(4)
-        .tickFormat(formatCount)
-        .tickSubdivide(0);
-
-    var svg = d3.select(this.get("chartElement")).append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var bar = svg.selectAll(".bar")
-      .data(data)
-    .enter().append("g")
-      .attr("class", "bar")
-      .style("fill", function(d) { return color(d[0]); })
-      .attr("transform", function(d) { return "translate(" + x(d.x) + ", " + y(d.y) + ")"; });
-
-    bar.append("rect")
+    enterSelection.append("rect")
+        .attr("class", "bar")
+        .style("fill", (d) => { return this.get("colorScale")(d[0]); })
+        .attr("transform", (d) => {
+          return "translate(" + this.get("xScale")(d.x) + ", " + this.get("yScale")(d.y) + ")";
+        })
         .attr("x", 1)
-        .attr("width", function(d) { return x(d.dx) - 1; })
-        .attr("height", function(d) { return height - y(d.y); });
+        .attr("width", (d) => { return this.get("xScale")(d.dx) - 1; })
+        .attr("height", (d) => { return this.get("plotHeight") - this.get("yScale")(d.y); });
+  },
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+  chartUpdate: function() {
+    this.chartEnter();
 
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
+    var updateSelection = this.chartElements();
 
+    updateSelection.style("fill", (d) => { return this.get("colorScale")(d[0]); })
+      .attr("transform", (d) => {
+        return "translate(" + this.get("xScale")(d.x) + ", " + this.get("yScale")(d.y) + ")";
+      })
+      .attr("x", 1)
+      .attr("width", (d) => { return this.get("xScale")(d.dx) - 1; })
+      .attr("height", (d) => { return this.get("plotHeight") - this.get("yScale")(d.y); });
+
+    var exitSelection = updateSelection.exit();
+    exitSelection.remove();
+  },
+
+  willInsertElement(){
+    this.set("chartDivHeight", 250);
+    this.set("xAxisRoom", 13);
+    this.set("yAxisRoom", 20);
+    this.set("legendRoom", 0);
   }
 
 });
