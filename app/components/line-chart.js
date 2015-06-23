@@ -6,6 +6,8 @@ var computed = Em.computed;
 export default Ember.Component.extend(Chart, {
 
   nDays: 21,  // TODO: unhardcode
+  timeframeStart: new Date(2015, 4, 1),
+  timeframeEnd: new Date(),
 
   chartDivWidth: computed("chartElement", function() {
     return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
@@ -19,7 +21,7 @@ export default Ember.Component.extend(Chart, {
     return d3.scale.ordinal().range(this.get("colorPalette"));
   }),
 
-  lineFunction: computed("", function(){
+  lineFunction: computed("xScale", "yScale", function(){
     return d3.svg.line()
       .x((d) => { return this.get("xScale")(d.date); })
       .y((d) => { return this.get("yScale")(d.value); });    
@@ -33,11 +35,17 @@ export default Ember.Component.extend(Chart, {
     return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
   }),
 
-  timestampedData: computed("data", "formatDateKeen", function() {
-    return this.get("data").processed.map((d) => {
+  timestampedData: computed("data", "formatDateKeen", "timeframeStart", "timeframeEnd", function() {
+    var _timestampedData = this.get("data").processed.map((d) => {
       d.date = this.get("formatDateKeen").parse(d.timeframe.start);
       return d;
     });
+
+    return this.filterByDate(
+      _timestampedData,
+      this.get("timeframeStart"),
+      this.get("timeframeEnd")
+    );
   }), 
 
   titleString: computed("data", function() {

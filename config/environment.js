@@ -35,7 +35,7 @@ module.exports = function(environment) {
       "engagement": {
         "filters": {
           // timeframe is underspecified for end: must be filled by the KPI with Time.now()
-          "timeframe": {
+          "baseTimeframe": {
             "start": "2015-05-20T00:00:00.000Z"
           }
         },

@@ -113,6 +113,12 @@ export default Ember.Mixin.create({
     }
   },
 
+  filterByDate: function(data, start, end) {
+    return data.filter(function(d) {
+      return (d.date >= start) && (d.date < end);
+    });
+  },
+
   formatPercentage: function(n, total) {
     return Math.round(100 * n / total).toString() + "%";
   },
@@ -124,7 +130,7 @@ export default Ember.Mixin.create({
         text = self.text();
       while (textLength > (width - 2 * padding) && text.length > 0) {
         text = text.slice(0, -1);
-        self.text(text + '...');
+        self.text(text + "...");
         textLength = self.node().getComputedTextLength();
       }
     });
