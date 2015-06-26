@@ -1,8 +1,7 @@
 import Ember from "ember";
-import HistogramMixin from "../mixins/histogram";
 import config from "../config/environment";
 
-export default Ember.Route.extend(HistogramMixin, {
+export default Ember.Route.extend({
 
   keenQuerying: Ember.inject.service(),
   config: config.KPI.engagement,
@@ -48,44 +47,14 @@ export default Ember.Route.extend(HistogramMixin, {
 
   setupController(controller, model) {
 
-    var self = this;
-
     var processedModel = model.map(function(m) {
       var query = m[0],
           specs = m[1];
 
-      // TODO: case logic ripe for a refactor
-      switch (specs.chartType) {
-        case "histogram":
-          var process = self.get("processHistogram");
-          return {
-            specs: specs,
-            //processed: process(query, specs.queryParams.groupBy)
-            processed: query.result
-          };
-        case "line":
-          return {
-            specs: specs,
-            processed: query.result
-          };
-        case "bar":
-          return {
-            specs: specs,
-            processed: query.result
-          };
-        case "stackedArea":
-          return {
-            specs: specs,
-            processed: query.result
-          };
-        case "ring":
-          return {
-            specs: specs,
-            processed: query.result
-          };          
-        default:
-          throw "Unexpected chartType!";
-      }
+      return {
+        specs: specs,
+        processed: query.result
+      };
     });
     
     controller.set("model", processedModel);
