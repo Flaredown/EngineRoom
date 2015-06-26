@@ -11,7 +11,17 @@ var fixture = function(){
           "groupBy": "n_conditions"
         }
       },
-      processed: [0, 1, 1, 3, 3, 4]
+      //processed: [0, 1, 1, 3, 3, 4]
+      processed: [
+        {
+          "value": [{"n_conditions": 0, result: 1}, {"n_conditions": 1, result: 2}, {"n_conditions": 2, result: 0}, {"n_conditions": 3, result: 2}, {"n_conditions": 4, result: 1}],
+          "timeframe": {"start": "2015-05-31T04:00:00.000Z", "end": "2015-06-01T04:00:00.000Z"}
+        },
+        {
+          "value": [{"n_conditions": 0, result: 2}, {"n_conditions": 1, result: 1}, {"n_conditions": 2, result: 0}, {"n_conditions": 3, result: 1}, {"n_conditions": 4, result: 3}],
+          "timeframe": {"start": "2015-06-01T04:00:00.000Z", "end": "2015-06-02T04:00:00.000Z"}
+        }
+      ]
     },
     large: {
       specs: {
@@ -23,7 +33,17 @@ var fixture = function(){
           "groupBy": "n_conditions"
         }
       },
-      processed: [0, 1, 1, 2, 3, 3, 4, 45, 90]
+      //processed: [0, 1, 1, 2, 3, 3, 4, 45, 90]
+      processed: [
+        {
+          "value": [{"n_conditions": 0, result: 1}, {"n_conditions": 1, result: 2}, {"n_conditions": 2, result: 0}, {"n_conditions": 3, result: 2}, {"n_conditions": 4, result: 1}, {"n_conditions": 45, result: 1}, {"n_conditions": 90, result: 1}],
+          "timeframe": {"start": "2015-05-31T04:00:00.000Z", "end": "2015-06-01T04:00:00.000Z"}
+        },
+        {
+          "value": [{"n_conditions": 0, result: 2}, {"n_conditions": 1, result: 1}, {"n_conditions": 2, result: 0}, {"n_conditions": 3, result: 1}, {"n_conditions": 4, result: 3}, {"n_conditions": 45, result: 1}, {"n_conditions": 90, result: 1}],
+          "timeframe": {"start": "2015-06-01T04:00:00.000Z", "end": "2015-06-02T04:00:00.000Z"}
+        }
+      ]      
     },    
   };
 };

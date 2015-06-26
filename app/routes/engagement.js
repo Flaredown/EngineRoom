@@ -60,7 +60,8 @@ export default Ember.Route.extend(HistogramMixin, {
           var process = self.get("processHistogram");
           return {
             specs: specs,
-            processed: process(query, specs.queryParams.groupBy)
+            //processed: process(query, specs.queryParams.groupBy)
+            processed: query.result
           };
         case "line":
           return {

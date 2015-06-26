@@ -65,6 +65,10 @@ export default Ember.Mixin.create({
     return $(this.get("#" + "elementId")).find("svg").length;
   }),
 
+  preprocessD3: function() {
+    //
+  },
+
   setupD3: function() {
     this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
     this.chartEnter();
@@ -114,6 +118,7 @@ export default Ember.Mixin.create({
   },
 
   filterByDate: function(data, start, end) {
+
     data.forEach((d) => {
       d.date = this.get("formatDateKeen").parse(d.timeframe.start);
     });

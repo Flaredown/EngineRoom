@@ -32,8 +32,7 @@ export default Ember.Component.extend(Chart, {
       .range(this.get("colorPalette"));
   }),
 
-  finalData: computed(
-    "colorScale", "data", "groups", "stackFunction", "timeframeStart", "timeframeEnd",
+  finalData: computed("data", "groups", "stackFunction", "timeframeStart", "timeframeEnd",
     function() {
 
       var _data = this.filterByDate(
@@ -50,7 +49,7 @@ export default Ember.Component.extend(Chart, {
           });
       });
 
-      return this.get("stackFunction")(this.get("colorScale").domain().map((name) => {
+      return this.get("stackFunction")(this.get("groups").map((name) => {
         return {
           groupBy: name,
           values: _data.map((d) => {
@@ -59,7 +58,6 @@ export default Ember.Component.extend(Chart, {
         };
       }));
   }),
-
 
   groupBy: computed("data", function() {
     return this.get("data").specs.queryParams.groupBy;

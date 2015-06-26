@@ -4,12 +4,39 @@ var computed = Em.computed;
 
 // TODO change all this.get("function") where it's not a computed property to this.function (in other files)
 
+function fillArray(value, len) {
+  var arr = [];
+  for (var i = 0; i < len; i++) {
+    arr.push(value);
+  }
+  return arr;
+}
+
+function melt(data) {
+  var melted = [];
+
+  for (var i = data.length - 1; i >= 0; i--) {
+    var x = data[i];
+
+    if (x.groupBy === null) {
+      melted = melted.concat(fillArray(0, x.value));
+    } else {
+      melted = melted.concat(fillArray(x.groupBy, x.value));
+    }
+  }
+
+  return melted;
+}
+
 export default Ember.Component.extend(Chart, {
 
-  binnedData: computed("data", "nBins", "xScale", function() {
+  timeframeStart: new Date(2015, 4, 1),  // TODO move to chart?
+  timeframeEnd: new Date(),  // TODO move to chart?  
+
+  binnedData: computed("finalData", "nBins", "xScale", function() {
     return d3.layout.histogram()
       .bins(this.get("xScale").ticks(this.get("nBins")))
-      (this.get("data.processed"));
+      (melt(this.get("finalData")));
   }),
 
   // TODO make this a for real computed property -- propertyDidChange("chartDivWidth")
@@ -25,8 +52,38 @@ export default Ember.Component.extend(Chart, {
     return d3.scale.ordinal().range(this.get("colorPalette"));
   }),
 
-  maxValue: computed("data", function() {
-    return Math.max.apply(null, this.get("data").processed);
+  finalData: computed("data", "groupBy", "timeframeStart", "timeframeEnd", function() {
+
+    var _data = this.filterByDate(
+      this.get("data").processed,
+      this.get("timeframeStart"),
+      this.get("timeframeEnd")
+    );
+
+    var _groupedData = _data[0].value.map((col, i) => { 
+      return {
+        value: _data.map((row) => {
+            return row.value[i].result;
+          })
+          .reduce((previousValue, currentValue) => {
+            return previousValue + currentValue;
+          }),
+        groupBy: col[this.get("groupBy")]
+      };
+    });
+
+    return _groupedData;
+
+  }),
+
+  groupBy: computed("data", function() {
+    return this.get("data").specs.queryParams.groupBy;
+  }),
+
+  maxValue: computed("finalData", function() {
+    var _values = this.get("finalData")
+      .map((d) => { return d.groupBy; });
+    return Math.max.apply(null, _values);
   }),
 
   nBins: computed("maxValue", "plotWidth", function() {

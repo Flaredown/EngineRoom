@@ -2,6 +2,20 @@ import Ember from "ember";
 import Chart from "../mixins/chart";
 var computed = Em.computed;
 
+function sortValues(groupedData) {
+  return groupedData.sort(
+    function (a, b) {
+      if (a.value > b.value) {
+        return -1;
+      }
+      if (a.value < b.value) {
+        return 1;
+      }
+      // a must be equal to b
+      return 0;
+    });
+}
+
 
 export default Ember.Component.extend(Chart, {
 
@@ -21,25 +35,8 @@ export default Ember.Component.extend(Chart, {
     return d3.scale.ordinal().range(this.get("colorPalette"));
   }),
 
-  groupBy: computed("data", function() {
-    return this.get("data").specs.queryParams.groupBy;
-  }),
-
-  groups: computed("data", "groupBy", function() {
-    return this.get("data").processed[0].value.map((x) => {
-      return x[this.get("groupBy")];
-    });
-  }),
-
-  plotHeight: computed("chartDivHeight", "margin", function() {
-    return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
-  }),
-
-  plotWidth: computed("chartDivWidth", "margin", function() {
-    return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
-  }),
-
-  sortedData: computed("data", "groupBy", "maxBars", "timeframeStart", "timeframeEnd", function() {
+  // TODO: should this go in route?
+  finalData: computed("data", "groupBy", "maxBars", "timeframeStart", "timeframeEnd", function() {
 
     var _data = this.filterByDate(
       this.get("data").processed,
@@ -59,20 +56,27 @@ export default Ember.Component.extend(Chart, {
       };
     });
 
-    // TODO: should this go in route?
-    return _groupedData.sort(
-      function (a, b) {
-        if (a.value > b.value) {
-          return -1;
-        }
-        if (a.value < b.value) {
-          return 1;
-        }
-        // a must be equal to b
-        return 0;
-      })
-        .filter((d) => { return d.groupBy !== null; })
-        .slice(0, this.get("maxBars"));    
+    return sortValues(_groupedData)
+      .filter((d) => { return d.groupBy !== null; })
+      .slice(0, this.get("maxBars"));    
+  }),
+  
+  groupBy: computed("data", function() {
+    return this.get("data").specs.queryParams.groupBy;
+  }),
+
+  groups: computed("data", "groupBy", function() {
+    return this.get("data").processed[0].value.map((x) => {
+      return x[this.get("groupBy")];
+    });
+  }),
+
+  plotHeight: computed("chartDivHeight", "margin", function() {
+    return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
+  }),
+
+  plotWidth: computed("chartDivWidth", "margin", function() {
+    return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
   }),
 
   titleString: computed("data", function() {
@@ -92,33 +96,33 @@ export default Ember.Component.extend(Chart, {
       .tickSubdivide(0);
   }),
 
-  xScale: computed("sortedData", "plotWidth", function(){
+  xScale: computed("finalData", "plotWidth", function(){
     return d3.scale.linear()
-      .domain([0, d3.max(this.get("sortedData"), (d) => { return d.value; })])
+      .domain([0, d3.max(this.get("finalData"), (d) => { return d.value; })])
       .range([0, this.get("plotWidth")]);
   }),
 
-  yAxis: computed("yScale", "sortedData", function(){
+  yAxis: computed("yScale", "finalData", function(){
     return d3.svg.axis()
       .scale(this.get("yScale"))
       .orient("left")
-      .ticks(this.get("sortedData").length);
+      .ticks(this.get("finalData").length);
   }),
 
-  yScale: computed("groupBy", "sortedData", "plotHeight", function(){
+  yScale: computed("groupBy", "finalData", "plotHeight", function(){
     return d3.scale.ordinal()
-      .domain(this.get("sortedData").map((d) => { return d.groupBy; }))
+      .domain(this.get("finalData").map((d) => { return d.groupBy; }))
       .rangeRoundBands([0, this.get("plotHeight")], 0.1);    
   }),
 
   chartElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll(".bar").data(this.get("sortedData"));
+    return this.get("svg").selectAll(".bar").data(this.get("finalData"));
   },
 
   chartEnter: function() {
     var enterSelection = this.get("svg").selectAll("rect.bar")
-      .data(this.get("sortedData"))
+      .data(this.get("finalData"))
       .enter();
 
     enterSelection.append("rect")

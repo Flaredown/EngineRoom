@@ -43,7 +43,7 @@ test("it draws the bars to the right height", function() {
   var bars = svg.find(".bar");
   var barHeight = parseInt(bars.first().attr("height"));
 
-  var expectedBarHeight = 106;  // fragile, depends on fixture and chart height
+  var expectedBarHeight = 159;  // fragile, depends on fixture and chart height
 
   equal(barHeight, expectedBarHeight);
 });

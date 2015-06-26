@@ -47,6 +47,7 @@ module.exports = function(environment) {
               "eventCollection": "entries",
               "targetProperty": "user_id",
               "groupBy": "n_conditions",
+              "interval": "daily"
             }
           },
           {
