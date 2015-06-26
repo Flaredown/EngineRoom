@@ -21,14 +21,9 @@ export default Ember.Component.extend(Chart, {
     return d3.scale.ordinal().range(this.get("colorPalette"));
   }),
 
-  finalData: computed("data", "formatDateKeen", "timeframeStart", "timeframeEnd", function() {
-    var _data = this.get("data").processed.map((d) => {
-      d.date = this.get("formatDateKeen").parse(d.timeframe.start);
-      return d;
-    });
-
+  finalData: computed("data", "timeframeStart", "timeframeEnd", function() {
     return this.filterByDate(
-      _data,
+      this.get("data").processed,
       this.get("timeframeStart"),
       this.get("timeframeEnd")
     );

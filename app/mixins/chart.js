@@ -114,6 +114,10 @@ export default Ember.Mixin.create({
   },
 
   filterByDate: function(data, start, end) {
+    data.forEach((d) => {
+      d.date = this.get("formatDateKeen").parse(d.timeframe.start);
+    });
+
     return data.filter(function(d) {
       return (d.date >= start) && (d.date < end);
     });

@@ -6,6 +6,8 @@ var computed = Em.computed;
 export default Ember.Component.extend(Chart, {
 
   maxBars: 12,
+  timeframeStart: new Date(2015, 4, 1),  // TODO move to chart?
+  timeframeEnd: new Date(),  // TODO move to chart?  
 
   chartDivWidth: computed("chartElement", function() {
     return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
@@ -23,28 +25,53 @@ export default Ember.Component.extend(Chart, {
     return this.get("data").specs.queryParams.groupBy;
   }),
 
-  plotHeight: computed("chartDivHeight", "margin", function(){
+  groups: computed("data", "groupBy", function() {
+    return this.get("data").processed[0].value.map((x) => {
+      return x[this.get("groupBy")];
+    });
+  }),
+
+  plotHeight: computed("chartDivHeight", "margin", function() {
     return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
   }),
 
-  plotWidth: computed("chartDivWidth", "margin", function(){
+  plotWidth: computed("chartDivWidth", "margin", function() {
     return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
   }),
 
-  sortedData: computed("data", "groupBy", "maxBars", function(){
+  sortedData: computed("data", "groupBy", "maxBars", "timeframeStart", "timeframeEnd", function() {
+
+    var _data = this.filterByDate(
+      this.get("data").processed,
+      this.get("timeframeStart"),
+      this.get("timeframeEnd")
+    );
+
+    var _groupedData = _data[0].value.map((col, i) => { 
+      return {
+        value: _data.map((row) => {
+            return row.value[i].result;
+          })
+          .reduce((previousValue, currentValue) => {
+            return previousValue + currentValue;
+          }),
+        groupBy: col[this.get("groupBy")]
+      };
+    });
+
     // TODO: should this go in route?
-    return this.get("data").processed.sort(
+    return _groupedData.sort(
       function (a, b) {
-        if (a.result > b.result) {
+        if (a.value > b.value) {
           return -1;
         }
-        if (a.result < b.result) {
+        if (a.value < b.value) {
           return 1;
         }
         // a must be equal to b
         return 0;
       })
-        .filter((value) => { return value[this.get("groupBy")] !== null; })
+        .filter((d) => { return d.groupBy !== null; })
         .slice(0, this.get("maxBars"));    
   }),
 
@@ -67,7 +94,7 @@ export default Ember.Component.extend(Chart, {
 
   xScale: computed("sortedData", "plotWidth", function(){
     return d3.scale.linear()
-      .domain([0, d3.max(this.get("sortedData"), (d) => { return d.result; })])
+      .domain([0, d3.max(this.get("sortedData"), (d) => { return d.value; })])
       .range([0, this.get("plotWidth")]);
   }),
 
@@ -80,7 +107,7 @@ export default Ember.Component.extend(Chart, {
 
   yScale: computed("groupBy", "sortedData", "plotHeight", function(){
     return d3.scale.ordinal()
-      .domain(this.get("sortedData").map((d) => { return d[this.get("groupBy")]; }))
+      .domain(this.get("sortedData").map((d) => { return d.groupBy; }))
       .rangeRoundBands([0, this.get("plotHeight")], 0.1);    
   }),
 
@@ -89,7 +116,7 @@ export default Ember.Component.extend(Chart, {
     return this.get("svg").selectAll(".bar").data(this.get("sortedData"));
   },
 
-  chartEnter: function(){
+  chartEnter: function() {
     var enterSelection = this.get("svg").selectAll("rect.bar")
       .data(this.get("sortedData"))
       .enter();
@@ -98,24 +125,24 @@ export default Ember.Component.extend(Chart, {
       .attr("class", "bar")
       .style("fill", (d, i) => { return this.get("colorScale")(i); })
       .attr("transform", (d) => {
-        return "translate(0, " + this.get("yScale")(d[this.get("groupBy")]) + ")";
+        return "translate(0, " + this.get("yScale")(d.groupBy) + ")";
       })
       .attr("x", 1)
-      .attr("width", (d) => { return this.get("xScale")(d.result); })
+      .attr("width", (d) => { return this.get("xScale")(d.value); })
       .attr("height", this.get("yScale").rangeBand);
   },
 
-  chartUpdate: function(){
+  chartUpdate: function() {
     this.chartEnter();
 
     var updateSelection = this.chartElements();
 
     updateSelection.style("fill", (d, i) => { return this.get("colorScale")(i); })
       .attr("transform", (d) => {
-        return "translate(0, " + this.get("yScale")(d[this.get("groupBy")]) + ")";
+        return "translate(0, " + this.get("yScale")(d.groupBy) + ")";
       })
       .attr("x", 1)
-      .attr("width", (d) => { return this.get("xScale")(d.result); })
+      .attr("width", (d) => { return this.get("xScale")(d.value); })
       .attr("height", this.get("yScale").rangeBand);
 
     var exitSelection = updateSelection.exit();

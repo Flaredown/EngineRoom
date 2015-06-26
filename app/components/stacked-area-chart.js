@@ -33,20 +33,22 @@ export default Ember.Component.extend(Chart, {
   }),
 
   finalData: computed(
-    "colorScale", "data", "formatDateKeen", "groups", "stackFunction", "timeframeStart", "timeframeEnd",
+    "colorScale", "data", "groups", "stackFunction", "timeframeStart", "timeframeEnd",
     function() {
-      var _data = this.get("data").processed;
+
+      var _data = this.filterByDate(
+        this.get("data").processed,
+        this.get("timeframeStart"),
+        this.get("timeframeEnd")
+      );
 
       _data.forEach((d) => {
-        d.date = this.get("formatDateKeen").parse(d.timeframe.start);
         d.total = d.value
           .map(function(x) { return x.result; })
           .reduce(function(previousValue, currentValue) {
             return previousValue + currentValue;
           });
       });
-
-      _data = this.filterByDate(_data, this.get("timeframeStart"), this.get("timeframeEnd"));
 
       return this.get("stackFunction")(this.get("colorScale").domain().map((name) => {
         return {
@@ -73,11 +75,11 @@ export default Ember.Component.extend(Chart, {
     return this.get("chartDivWidth") - this.get("margin").left - this.get("margin").right;
   }),
 
-  plotHeight: computed("chartDivHeight", "margin", function(){
+  plotHeight: computed("chartDivHeight", "margin", function() {
     return this.get("chartDivHeight") - this.get("margin").top - this.get("margin").bottom;
   }),
 
-  stackFunction: computed(function(){
+  stackFunction: computed(function() {
     return d3.layout.stack()
       .values(function(d) { return d.values; });
   }),

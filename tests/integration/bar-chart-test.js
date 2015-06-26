@@ -37,7 +37,7 @@ test("it draws as many bars as groups for a small dataset", function() {
   var svg = component.$().find("svg");
   var bars = svg.find(".bar");
 
-  var expected_n_bars = 7;  // fragile, depends on fixture
+  var expected_n_bars = 11;  // fragile, depends on fixture
 
   equal(bars.length, expected_n_bars);
 });
@@ -73,12 +73,14 @@ test("it writes a chart title", function() {
 //
 
 test("it truncates long y-axis labels", function() {
-  var longLabel = component.get("data").processed[0].name;  // fragile, depends on fixture
+
+  var longLabel = component.get("groups")[0];  // fragile, depends on fixture
+  //var longLabel = component.get("data").processed[0].name;  // fragile, depends on fixture
 
   var yAxis = component.$().find(".y");
   var yAxisLabels = yAxis.find("text");
 
-  var magicNumber = 12;  // fragile, depends on component.yAxisRoom and axis label text
+  var magicNumber = 10;  // fragile, depends on component.yAxisRoom and axis label text
   var expectedTruncation = longLabel.slice(0, magicNumber) + "...";
 
   equal(yAxisLabels[0].textContent, expectedTruncation);
@@ -96,5 +98,5 @@ test("it updates the chart based on changes in data", function() {
 
   this.subject().set("data", barChartFixture().small);
 
-  equal(svg.find(".bar").length, 7, "updates to small dataset and shows all bars");
+  equal(svg.find(".bar").length, 11, "updates to small dataset and shows all bars");
 });
