@@ -8,8 +8,6 @@ export default Ember.Component.extend(Chart, {
   nDays: 4,  // TODO: unhardcode
   legendRectSize: 18,
   legendSpacing: 4,
-  timeframeStart: new Date(2015, 4, 1),  // TODO move to chart?
-  timeframeEnd: new Date(),  // TODO move to chart?
 
   areaFunction: computed("xScale", "yScale", function() {
     return d3.svg.area()

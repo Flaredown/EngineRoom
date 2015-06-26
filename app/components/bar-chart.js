@@ -20,9 +20,7 @@ function sortValues(groupedData) {
 export default Ember.Component.extend(Chart, {
 
   maxBars: 12,
-  timeframeStart: new Date(2015, 4, 1),  // TODO move to chart?
-  timeframeEnd: new Date(),  // TODO move to chart?  
-
+  
   chartDivWidth: computed("chartElement", function() {
     return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
   }),

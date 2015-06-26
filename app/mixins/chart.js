@@ -45,6 +45,8 @@ export default Ember.Mixin.create({
   formatDateKeen: d3.time.format(KEEN_DATE_FORMAT),
   paddingRight: PADDING_RIGHT,
   paddingTop: PADDING_TOP,
+  timeframeStart: new Date(2015, 4, 1),
+  timeframeEnd: new Date(),
 
   margin: computed("xAxisRoom", "yAxisRoom", "legendRoom", function() {
     return {

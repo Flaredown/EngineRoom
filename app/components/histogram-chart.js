@@ -30,9 +30,6 @@ function melt(data) {
 
 export default Ember.Component.extend(Chart, {
 
-  timeframeStart: new Date(2015, 4, 1),  // TODO move to chart?
-  timeframeEnd: new Date(),  // TODO move to chart?  
-
   binnedData: computed("finalData", "nBins", "xScale", function() {
     return d3.layout.histogram()
       .bins(this.get("xScale").ticks(this.get("nBins")))

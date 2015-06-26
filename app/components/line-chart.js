@@ -6,8 +6,6 @@ var computed = Em.computed;
 export default Ember.Component.extend(Chart, {
 
   nDays: 4,  // TODO: unhardcode
-  timeframeStart: new Date(2015, 4, 1),
-  timeframeEnd: new Date(),
 
   chartDivWidth: computed("chartElement", function() {
     return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
