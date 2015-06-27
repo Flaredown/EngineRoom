@@ -67,10 +67,6 @@ export default Ember.Mixin.create({
     return $(this.get("#" + "elementId")).find("svg").length;
   }),
 
-  preprocessD3: function() {
-    //
-  },
-
   setupD3: function() {
     this.drawSvg(this.get("chartElement"), this.get("plotWidth"), this.get("plotHeight"), this.get("margin"));
     this.chartEnter();

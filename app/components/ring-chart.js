@@ -30,6 +30,46 @@ export default Ember.Component.extend(Chart, {
   xAxis: null,  // TODO: is this the right way to handle not needing axes?
   yAxis: null,
 
+  // data properties
+
+  processedData: computed("data", "groupBy", "timeframeStart", "timeframeEnd", function() {
+
+    var _data = this.filterByDate(
+      this.get("data").processed,
+      this.get("timeframeStart"),
+      this.get("timeframeEnd")
+    );
+
+    var _processedData = _data[0].value.map((col, i) => { 
+      return {
+        value: _data.map((row) => {
+            return row.value[i].result;
+          })
+          .reduce((previousValue, currentValue) => {
+            return previousValue + currentValue;
+          }),
+        groupBy: col[this.get("groupBy")]
+      };
+    });
+
+    return _processedData;
+  }),
+
+  dataForD3: computed("processedData", function() {
+    var pieFunction = d3.layout.pie()
+      .value(function(d) { return d.value; })
+      .sort(null);
+
+    // will it come back to bite us if we do the filtering here and not in processedData?
+    return pieFunction(
+      this.get("processedData").filter((value) => { return value.groupBy !== null; })
+    );
+
+  }),
+
+  // other properties
+
+
   arcFunction: computed("holeWidth", "radius", function() {
     return d3.svg.arc()
       .innerRadius(this.get("radius") - this.get("holeWidth"))
@@ -50,45 +90,8 @@ export default Ember.Component.extend(Chart, {
       .range(this.get("colorPalette"));
   }),
 
-  finalData: computed("groupedData", function() {
-    var pieFunction = d3.layout.pie()
-      .value(function(d) { return d.value; })
-      .sort(null);
-
-    // will it come back to bite us if we do the filtering here and not in groupedData?
-    return pieFunction(
-      this.get("groupedData").filter((value) => { return value.groupBy !== null; })
-    );
-
-  }),
-
   groupBy: computed("data", function() {
     return this.get("data").specs.queryParams.groupBy;
-  }),
-
-
-  // TODO move some or all of this into route
-  groupedData: computed("data", "groupBy", "timeframeStart", "timeframeEnd", function() {
-
-    var _data = this.filterByDate(
-      this.get("data").processed,
-      this.get("timeframeStart"),
-      this.get("timeframeEnd")
-    );
-
-    var _groupedData = _data[0].value.map((col, i) => { 
-      return {
-        value: _data.map((row) => {
-            return row.value[i].result;
-          })
-          .reduce((previousValue, currentValue) => {
-            return previousValue + currentValue;
-          }),
-        groupBy: col[this.get("groupBy")]
-      };
-    });
-
-    return _groupedData;
   }),
 
   groups: computed("data", "groupBy", function() {
@@ -130,15 +133,15 @@ export default Ember.Component.extend(Chart, {
       " by " + spec.queryParams.groupBy;
   }),
 
-  total: computed("groupedData", function() {
-    return this.get("groupedData")
+  total: computed("processedData", function() {
+    return this.get("processedData")
       .map((x) => { return x.value; })
       .reduce((previousValue, currentValue) => { return previousValue + currentValue; });
   }),
 
   chartElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll("g.group").data(this.get("finalData"));
+    return this.get("svg").selectAll("g.group").data(this.get("dataForD3"));
   },
 
   chartEnter: function(){
@@ -156,7 +159,7 @@ export default Ember.Component.extend(Chart, {
     );
 
     var enterSelection = this.get("svg").selectAll("g.group")
-      .data(this.get("finalData"))
+      .data(this.get("dataForD3"))
       .enter();
 
     var groups = enterSelection.append("g")
@@ -264,13 +267,13 @@ export default Ember.Component.extend(Chart, {
 
   legendElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll(".legend").data(this.get("groupedData"));       
+    return this.get("svg").selectAll(".legend").data(this.get("processedData"));       
   },
 
   legendEnter: function() {
 
     var enterSelection = this.get("svg").selectAll(".legend")
-      .data(this.get("groupedData"))
+      .data(this.get("processedData"))
       .enter();
 
     var legendGs = enterSelection.append("g")

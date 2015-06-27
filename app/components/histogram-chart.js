@@ -30,26 +30,9 @@ function melt(data) {
 
 export default Ember.Component.extend(Chart, {
 
-  binnedData: computed("finalData", "nBins", "xScale", function() {
-    return d3.layout.histogram()
-      .bins(this.get("xScale").ticks(this.get("nBins")))
-      (melt(this.get("finalData")));
-  }),
+  // data properties
 
-  // TODO make this a for real computed property -- propertyDidChange("chartDivWidth")
-  chartDivWidth: computed("chartElement", function() {
-    return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
-  }),
-
-  chartElement: computed("elementId", function() {
-    return "#" + this.get("elementId") + " .chart";
-  }),
-
-  colorScale: computed("colorPalette", function() {
-    return d3.scale.ordinal().range(this.get("colorPalette"));
-  }),
-
-  finalData: computed("data", "groupBy", "timeframeStart", "timeframeEnd", function() {
+  processedData: computed("data", "groupBy", "timeframeStart", "timeframeEnd", function() {
 
     var _data = this.filterByDate(
       this.get("data").processed,
@@ -73,12 +56,33 @@ export default Ember.Component.extend(Chart, {
 
   }),
 
+  dataForD3: computed("processedData", "nBins", "xScale", function() {
+    return d3.layout.histogram()
+      .bins(this.get("xScale").ticks(this.get("nBins")))
+      (melt(this.get("processedData")));
+  }),
+
+  // other properties
+
+  // TODO make this a for real computed property -- propertyDidChange("chartDivWidth")
+  chartDivWidth: computed("chartElement", function() {
+    return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
+  }),
+
+  chartElement: computed("elementId", function() {
+    return "#" + this.get("elementId") + " .chart";
+  }),
+
+  colorScale: computed("colorPalette", function() {
+    return d3.scale.ordinal().range(this.get("colorPalette"));
+  }),
+
   groupBy: computed("data", function() {
     return this.get("data").specs.queryParams.groupBy;
   }),
 
-  maxValue: computed("finalData", function() {
-    var _values = this.get("finalData")
+  maxValue: computed("processedData", function() {
+    var _values = this.get("processedData")
       .map((d) => { return d.groupBy; });
     return Math.max.apply(null, _values);
   }),
@@ -125,20 +129,20 @@ export default Ember.Component.extend(Chart, {
       .tickSubdivide(0);  
   }),
 
-  yScale: computed("binnedData", "paddingTop", "plotHeight", function() {
+  yScale: computed("dataForD3", "paddingTop", "plotHeight", function() {
     return d3.scale.linear()
-      .domain([0, d3.max(this.get("binnedData"), function(d) { return d.y; })])
+      .domain([0, d3.max(this.get("dataForD3"), function(d) { return d.y; })])
       .range([this.get("plotHeight"), 0 + this.get("paddingTop")]);
   }),
 
   chartElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll(".bar").data(this.get("binnedData"));
+    return this.get("svg").selectAll(".bar").data(this.get("dataForD3"));
   },
 
   chartEnter: function() {
     var enterSelection = this.get("svg").selectAll("rect.bar")
-      .data(this.get("binnedData"))
+      .data(this.get("dataForD3"))
       .enter();
 
     enterSelection.append("rect")

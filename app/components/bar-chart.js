@@ -21,20 +21,9 @@ export default Ember.Component.extend(Chart, {
 
   maxBars: 12,
   
-  chartDivWidth: computed("chartElement", function() {
-    return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
-  }),
+  // data properties
 
-  chartElement: computed("elementId", function() {
-    return "#" + this.get("elementId") + " .chart";
-  }),
-
-  colorScale: computed("colorPalette", function() {
-    return d3.scale.ordinal().range(this.get("colorPalette"));
-  }),
-
-  // TODO: should this go in route?
-  finalData: computed("data", "groupBy", "maxBars", "timeframeStart", "timeframeEnd", function() {
+  prcoessedData: computed("data", "groupBy", "maxBars", "timeframeStart", "timeframeEnd", function() {
 
     var _data = this.filterByDate(
       this.get("data").processed,
@@ -57,6 +46,20 @@ export default Ember.Component.extend(Chart, {
     return sortValues(_groupedData)
       .filter((d) => { return d.groupBy !== null; })
       .slice(0, this.get("maxBars"));    
+  }),
+
+  // other properties
+
+  chartDivWidth: computed("chartElement", function() {
+    return parseInt(d3.select(this.get("chartElement")).style("width"), 10);
+  }),
+
+  chartElement: computed("elementId", function() {
+    return "#" + this.get("elementId") + " .chart";
+  }),
+
+  colorScale: computed("colorPalette", function() {
+    return d3.scale.ordinal().range(this.get("colorPalette"));
   }),
   
   groupBy: computed("data", function() {
@@ -94,33 +97,33 @@ export default Ember.Component.extend(Chart, {
       .tickSubdivide(0);
   }),
 
-  xScale: computed("finalData", "plotWidth", function(){
+  xScale: computed("prcoessedData", "plotWidth", function(){
     return d3.scale.linear()
-      .domain([0, d3.max(this.get("finalData"), (d) => { return d.value; })])
+      .domain([0, d3.max(this.get("prcoessedData"), (d) => { return d.value; })])
       .range([0, this.get("plotWidth")]);
   }),
 
-  yAxis: computed("yScale", "finalData", function(){
+  yAxis: computed("yScale", "prcoessedData", function(){
     return d3.svg.axis()
       .scale(this.get("yScale"))
       .orient("left")
-      .ticks(this.get("finalData").length);
+      .ticks(this.get("prcoessedData").length);
   }),
 
-  yScale: computed("groupBy", "finalData", "plotHeight", function(){
+  yScale: computed("groupBy", "prcoessedData", "plotHeight", function(){
     return d3.scale.ordinal()
-      .domain(this.get("finalData").map((d) => { return d.groupBy; }))
+      .domain(this.get("prcoessedData").map((d) => { return d.groupBy; }))
       .rangeRoundBands([0, this.get("plotHeight")], 0.1);    
   }),
 
   chartElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll(".bar").data(this.get("finalData"));
+    return this.get("svg").selectAll(".bar").data(this.get("prcoessedData"));
   },
 
   chartEnter: function() {
     var enterSelection = this.get("svg").selectAll("rect.bar")
-      .data(this.get("finalData"))
+      .data(this.get("prcoessedData"))
       .enter();
 
     enterSelection.append("rect")

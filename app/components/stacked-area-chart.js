@@ -9,6 +9,41 @@ export default Ember.Component.extend(Chart, {
   legendRectSize: 18,
   legendSpacing: 4,
 
+  // data properties
+
+  processedData: computed("data", "timeframeStart", "timeframeEnd",
+    function() {
+
+      var _data = this.filterByDate(
+        this.get("data").processed,
+        this.get("timeframeStart"),
+        this.get("timeframeEnd")
+      );
+
+      _data.forEach((d) => {
+        d.total = d.value
+          .map(function(x) { return x.result; })
+          .reduce(function(previousValue, currentValue) {
+            return previousValue + currentValue;
+          });
+      });
+
+      return _data;
+  }),
+
+  dataForD3: computed("processedData", "stackFunction", "groups", function() {
+    return this.get("stackFunction")(this.get("groups").map((name) => {
+      return {
+        groupBy: name,
+        values: this.get("processedData").map((d) => {
+          return { date: d.date, y: d.value[this.get("groups").indexOf(name)].result };
+        })
+      };
+    }));    
+  }),
+
+  // other properties
+
   areaFunction: computed("xScale", "yScale", function() {
     return d3.svg.area()
       .x((d) => { return this.get("xScale")(d.date); })
@@ -28,33 +63,6 @@ export default Ember.Component.extend(Chart, {
     return d3.scale.ordinal()
       .domain(this.get("groups"))
       .range(this.get("colorPalette"));
-  }),
-
-  finalData: computed("data", "groups", "stackFunction", "timeframeStart", "timeframeEnd",
-    function() {
-
-      var _data = this.filterByDate(
-        this.get("data").processed,
-        this.get("timeframeStart"),
-        this.get("timeframeEnd")
-      );
-
-      _data.forEach((d) => {
-        d.total = d.value
-          .map(function(x) { return x.result; })
-          .reduce(function(previousValue, currentValue) {
-            return previousValue + currentValue;
-          });
-      });
-
-      return this.get("stackFunction")(this.get("groups").map((name) => {
-        return {
-          groupBy: name,
-          values: _data.map((d) => {
-            return { date: d.date, y: d.value[this.get("groups").indexOf(name)].result };
-          })
-        };
-      }));
   }),
 
   groupBy: computed("data", function() {
@@ -80,14 +88,15 @@ export default Ember.Component.extend(Chart, {
       .values(function(d) { return d.values; });
   }),
 
-  titleString: computed("data", function() {
+  titleString: computed("data", "formatDateDisplay", "timeframeStart", "timeframeEnd", function() {
     var spec = this.get("data").specs;
     return spec.queryType +
       " " + spec.queryParams.targetProperty +
       " in " + spec.queryParams.eventCollection +
       " by " + spec.queryParams.groupBy +
       " " + spec.queryParams.interval +
-      " over " + spec.queryParams.timeframe;
+      " from " + this.get("formatDateDisplay")(this.get("timeframeStart")) +
+      " to " + this.get("formatDateDisplay")(this.get("timeframeEnd")) ;
   }),
 
   xAxis: computed("formatDateDisplay", "nDays", "xScale", function() {
@@ -99,9 +108,9 @@ export default Ember.Component.extend(Chart, {
       .tickSubdivide(0);
   }),
 
-  xScale: computed("data", "plotWidth", function() {
+  xScale: computed("processedData", "plotWidth", function() {
     return d3.time.scale()
-      .domain(d3.extent(this.get("data").processed, function(d) { return d.date; }))
+      .domain(d3.extent(this.get("processedData"), function(d) { return d.date; }))
       .range([0, this.get("plotWidth")]);
   }),
 
@@ -129,12 +138,12 @@ export default Ember.Component.extend(Chart, {
 
   chartElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll(".group").data(this.get("finalData"));   
+    return this.get("svg").selectAll(".group").data(this.get("dataForD3"));   
   },
 
   chartEnter: function() {
     var enterSelection = this.get("svg").selectAll("path.group")
-      .data(this.get("finalData"))
+      .data(this.get("dataForD3"))
       .enter();   
 
     enterSelection.append("path")
@@ -161,12 +170,12 @@ export default Ember.Component.extend(Chart, {
 
   legendElements: function() {
     // this returns the update selection
-    return this.get("svg").selectAll(".legend").data(this.get("finalData"));       
+    return this.get("svg").selectAll(".legend").data(this.get("dataForD3"));       
   },
 
   legendEnter: function() {
     var enterSelection = this.get("svg").selectAll(".legend")
-      .data(this.get("finalData"))
+      .data(this.get("dataForD3"))
       .enter();   
 
     var legendGs = enterSelection.append("g")
