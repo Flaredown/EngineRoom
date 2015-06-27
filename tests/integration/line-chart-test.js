@@ -31,7 +31,7 @@ test("it sizes the svg based on div size and margin options", function() {
 });
 
 test("it draws a line", function() {
-  var processedData = lineChartFixture().small.processed;
+  var processedData = lineChartFixture().small.raw;
 
   var svg = component.$().find("svg");
   var line = svg.find(".line")[0];
@@ -73,14 +73,14 @@ test("it updates the chart based on changes in data", function() {
   this.subject().set("data", lineChartFixture().large);
 
   var largeFixtureSegments = _segments(component.$().find("svg").find(".line")[0]);
-  equal(largeFixtureSegments.length, component.get("data").processed.length,
+  equal(largeFixtureSegments.length, component.get("data").raw.length,
     "updates to a large dataset"
   );
 
   this.subject().set("data", lineChartFixture().small);
 
   var smallFixtureSegments = _segments(component.$().find("svg").find(".line")[0]);
-  equal(smallFixtureSegments.length, component.get("data").processed.length,
+  equal(smallFixtureSegments.length, component.get("data").raw.length,
     "updates to a small dataset"
   );
 });

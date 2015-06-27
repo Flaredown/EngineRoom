@@ -35,7 +35,7 @@ export default Ember.Component.extend(Chart, {
   processedData: computed("data", "groupBy", "timeframeStart", "timeframeEnd", function() {
 
     var _data = this.filterByDate(
-      this.get("data").processed,
+      this.get("data").raw,
       this.get("timeframeStart"),
       this.get("timeframeEnd")
     );

@@ -75,7 +75,6 @@ test("it writes a chart title", function() {
 test("it truncates long y-axis labels", function() {
 
   var longLabel = component.get("groups")[0];  // fragile, depends on fixture
-  //var longLabel = component.get("data").processed[0].name;  // fragile, depends on fixture
 
   var yAxis = component.$().find(".y");
   var yAxisLabels = yAxis.find("text");

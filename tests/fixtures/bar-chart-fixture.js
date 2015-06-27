@@ -10,16 +10,7 @@ var fixture = function() {
           "groupBy": "user_agent.browser.name"
         }
       },
-      // processed: [
-      //   {"name":"Thing 1","result":1},
-      //   {"name":"Thing 2","result":1},
-      //   {"name":"Thing 3","result":1},
-      //   {"name":"Thing 4","result":3},
-      //   {"name":"Thing 5","result":4},
-      //   {"name":"Thing 6 with a hugely long name","result":5},
-      //   {"name":"Thing 7","result":1}
-      // ]
-      processed: [
+      raw: [
        {"value":[{"user_agent.browser.name":"Hoodly Browser","result":44},{"user_agent.browser.name":"Chromium","result":0},{"user_agent.browser.name":"Facebook","result":0},{"user_agent.browser.name":"Firefox","result":12},{"user_agent.browser.name":"IE","result":1},{"user_agent.browser.name":"IEMobile","result":0},{"user_agent.browser.name":"Mobile Safari","result":20},{"user_agent.browser.name":"Opera","result":0},{"user_agent.browser.name":"Safari","result":2},{"user_agent.browser.name":"Silk","result":0},{"user_agent.browser.name":"WebKit","result":2}],"timeframe":{"start":"2015-05-25T00:00:00.000Z","end":"2015-05-26T00:00:00.000Z"}},
        {"value":[{"user_agent.browser.name":"Hoodly Browser","result":199},{"user_agent.browser.name":"Chromium","result":0},{"user_agent.browser.name":"Facebook","result":0},{"user_agent.browser.name":"Firefox","result":55},{"user_agent.browser.name":"IE","result":9},{"user_agent.browser.name":"IEMobile","result":0},{"user_agent.browser.name":"Mobile Safari","result":60},{"user_agent.browser.name":"Opera","result":4},{"user_agent.browser.name":"Safari","result":23},{"user_agent.browser.name":"Silk","result":0},{"user_agent.browser.name":"WebKit","result":4}],"timeframe":{"start":"2015-05-26T00:00:00.000Z","end":"2015-05-27T00:00:00.000Z"}},
        {"value":[{"user_agent.browser.name":"Hoodly Browser","result":99},{"user_agent.browser.name":"Chromium","result":2},{"user_agent.browser.name":"Facebook","result":0},{"user_agent.browser.name":"Firefox","result":32},{"user_agent.browser.name":"IE","result":4},{"user_agent.browser.name":"IEMobile","result":0},{"user_agent.browser.name":"Mobile Safari","result":37},{"user_agent.browser.name":"Opera","result":0},{"user_agent.browser.name":"Safari","result":16},{"user_agent.browser.name":"Silk","result":1},{"user_agent.browser.name":"WebKit","result":1}],"timeframe":{"start":"2015-05-27T00:00:00.000Z","end":"2015-05-28T00:00:00.000Z"}},
@@ -43,23 +34,7 @@ var fixture = function() {
           "groupBy": "user_agent.browser.name"
         }
       },
-      // processed: [
-      //   {"name":"Thing 1","result":1},
-      //   {"name":"Thing 2","result":4},
-      //   {"name":"Thing 3","result":2},
-      //   {"name":"Thing 4","result":3},
-      //   {"name":"Thing 5","result":4},
-      //   {"name":"Thing 6","result":5},
-      //   {"name":"Thing 7","result":1},
-      //   {"name":"Thing 8","result":7},
-      //   {"name":"Thing 9","result":4},
-      //   {"name":"Thing 10","result":8},
-      //   {"name":"Thing 11","result":3},
-      //   {"name":"Thing 12","result":4},
-      //   {"name":"Thing 13","result":5},
-      //   {"name":"Thing 14","result":9}        
-      // ]
-      processed: [
+      raw: [
        {"value":[{"user_agent.browser.name":"Hoodly Browser","result":8},{"user_agent.browser.name":"Android Browser","result":0},{"user_agent.browser.name":"Chrome","result":44},{"user_agent.browser.name":"Chromium","result":0},{"user_agent.browser.name":"Facebook","result":0},{"user_agent.browser.name":"Firefox","result":12},{"user_agent.browser.name":"IE","result":1},{"user_agent.browser.name":"IEMobile","result":0},{"user_agent.browser.name":"Mobile Safari","result":20},{"user_agent.browser.name":"Opera","result":0},{"user_agent.browser.name":"Safari","result":2},{"user_agent.browser.name":"Silk","result":0},{"user_agent.browser.name":"WebKit","result":2}],"timeframe":{"start":"2015-05-25T00:00:00.000Z","end":"2015-05-26T00:00:00.000Z"}},
        {"value":[{"user_agent.browser.name":"Hoodly Browser","result":7},{"user_agent.browser.name":"Android Browser","result":3},{"user_agent.browser.name":"Chrome","result":199},{"user_agent.browser.name":"Chromium","result":0},{"user_agent.browser.name":"Facebook","result":0},{"user_agent.browser.name":"Firefox","result":55},{"user_agent.browser.name":"IE","result":9},{"user_agent.browser.name":"IEMobile","result":0},{"user_agent.browser.name":"Mobile Safari","result":60},{"user_agent.browser.name":"Opera","result":4},{"user_agent.browser.name":"Safari","result":23},{"user_agent.browser.name":"Silk","result":0},{"user_agent.browser.name":"WebKit","result":4}],"timeframe":{"start":"2015-05-26T00:00:00.000Z","end":"2015-05-27T00:00:00.000Z"}},
        {"value":[{"user_agent.browser.name":"Hoodly Browser","result":5},{"user_agent.browser.name":"Android Browser","result":0},{"user_agent.browser.name":"Chrome","result":99},{"user_agent.browser.name":"Chromium","result":2},{"user_agent.browser.name":"Facebook","result":0},{"user_agent.browser.name":"Firefox","result":32},{"user_agent.browser.name":"IE","result":4},{"user_agent.browser.name":"IEMobile","result":0},{"user_agent.browser.name":"Mobile Safari","result":37},{"user_agent.browser.name":"Opera","result":0},{"user_agent.browser.name":"Safari","result":16},{"user_agent.browser.name":"Silk","result":1},{"user_agent.browser.name":"WebKit","result":1}],"timeframe":{"start":"2015-05-27T00:00:00.000Z","end":"2015-05-28T00:00:00.000Z"}},

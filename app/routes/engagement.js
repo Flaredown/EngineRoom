@@ -53,7 +53,7 @@ export default Ember.Route.extend({
 
       return {
         specs: specs,
-        processed: query.result
+        raw: query.result
       };
     });
     

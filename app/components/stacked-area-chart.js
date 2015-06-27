@@ -15,7 +15,7 @@ export default Ember.Component.extend(Chart, {
     function() {
 
       var _data = this.filterByDate(
-        this.get("data").processed,
+        this.get("data").raw,
         this.get("timeframeStart"),
         this.get("timeframeEnd")
       );
@@ -70,7 +70,7 @@ export default Ember.Component.extend(Chart, {
   }),
 
   groups: computed("data", "groupBy", function() {
-    return this.get("data").processed[0].value.map((x) => {
+    return this.get("data").raw[0].value.map((x) => {
       return x[this.get("groupBy")];
     });
   }),
@@ -125,7 +125,7 @@ export default Ember.Component.extend(Chart, {
 
   yScale: computed("data", "plotHeight", function() {
     return d3.scale.linear()
-      .domain([0, d3.max(this.get("data").processed, function(d) { return d.total; })])
+      .domain([0, d3.max(this.get("data").raw, function(d) { return d.total; })])
       .range([this.get("plotHeight"), 0]);
   }),
 

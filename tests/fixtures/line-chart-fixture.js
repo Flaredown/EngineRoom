@@ -11,7 +11,7 @@ var fixture = function() {
           "interval": "daily"
         }
       },
-      processed: [
+      raw: [
         {"value":38,"timeframe":{"start":"2015-05-31T04:00:00.000Z","end":"2015-06-01T04:00:00.000Z"}},
         {"value":54,"timeframe":{"start":"2015-06-01T04:00:00.000Z","end":"2015-06-02T04:00:00.000Z"}},
         {"value":49,"timeframe":{"start":"2015-06-02T04:00:00.000Z","end":"2015-06-03T04:00:00.000Z"}},
@@ -32,7 +32,7 @@ var fixture = function() {
           "interval": "daily"
         }
       },
-      processed: [
+      raw: [
         {"value":38,"timeframe":{"start":"2015-05-31T04:00:00.000Z","end":"2015-06-01T04:00:00.000Z"}},
         {"value":54,"timeframe":{"start":"2015-06-01T04:00:00.000Z","end":"2015-06-02T04:00:00.000Z"}},
         {"value":49,"timeframe":{"start":"2015-06-02T04:00:00.000Z","end":"2015-06-03T04:00:00.000Z"}},

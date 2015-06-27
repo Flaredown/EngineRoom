@@ -31,7 +31,7 @@ test("it sizes the svg based on div size and margin options", function() {
 });
 
 test("it draws arcs", function() {
-  var processedData = component.get("data").processed;
+  var processedData = component.get("data").raw;
 
   var svg = component.$().find("svg");
   var groups = svg.find(".group");
@@ -43,7 +43,7 @@ test("it draws arcs", function() {
 });
 
 test("it draws labels in arcs", function() {
-  var processedData = component.get("data").processed;
+  var processedData = component.get("data").raw;
 
   var svg = component.$().find("svg");
   var groups = svg.find(".group");
@@ -80,7 +80,7 @@ test("it writes a chart title", function() {
 });
 
 test("it draws a legend", function() {
-  var processedData = component.get("data").processed;
+  var processedData = component.get("data").raw;
 
   var svg = component.$().find("svg");
   var legendEntries = svg.find(".legend");
@@ -115,29 +115,29 @@ test("it updates the chart based on changes in data", function() {
 
   this.subject().set("data", ringChartFixture().large);
 
-  equal(svg.find(".group").length, component.get("data").processed[0].value.length,
+  equal(svg.find(".group").length, component.get("data").raw[0].value.length,
     "updates to a large dataset: groups"
   );
 
-  equal(svg.find(".group text").length, component.get("data").processed[0].value.length,
+  equal(svg.find(".group text").length, component.get("data").raw[0].value.length,
     "updates to a large dataset: group labels"
   );
 
-  equal(svg.find(".legend").length, component.get("data").processed[0].value.length,
+  equal(svg.find(".legend").length, component.get("data").raw[0].value.length,
     "updates to a large dataset: legend"
   );
 
   this.subject().set("data", ringChartFixture().small);
 
-  equal(svg.find(".group").length, component.get("data").processed[0].value.length,
+  equal(svg.find(".group").length, component.get("data").raw[0].value.length,
     "updates to a small dataset: groups"
   );
 
-  equal(svg.find(".group text").length, component.get("data").processed[0].value.length,
+  equal(svg.find(".group text").length, component.get("data").raw[0].value.length,
     "updates to a small dataset: group labels"
   );  
 
-  equal(svg.find(".legend").length, component.get("data").processed[0].value.length,
+  equal(svg.find(".legend").length, component.get("data").raw[0].value.length,
     "updates to a small dataset: legend"
   );  
 });

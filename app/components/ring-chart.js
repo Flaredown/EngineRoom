@@ -35,7 +35,7 @@ export default Ember.Component.extend(Chart, {
   processedData: computed("data", "groupBy", "timeframeStart", "timeframeEnd", function() {
 
     var _data = this.filterByDate(
-      this.get("data").processed,
+      this.get("data").raw,
       this.get("timeframeStart"),
       this.get("timeframeEnd")
     );
@@ -96,7 +96,7 @@ export default Ember.Component.extend(Chart, {
 
   groups: computed("data", "groupBy", function() {
 
-    var firstDay = this.get("data").processed[0].value;
+    var firstDay = this.get("data").raw[0].value;
 
     return firstDay.map((d) => {
       return d[this.get("groupBy")];
