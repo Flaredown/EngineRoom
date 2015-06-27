@@ -1,0 +1,15 @@
+.engine-room.application
+  .container
+    h3 Visits
+    ul.small-block-grid-1.medium-block-grid-2.large-block-grid-3
+      li
+        stacked-area-chart data=visitsByBrowser
+      li    
+        ring-chart data=browserShare
+      li
+        ring-chart data=osShare
+      li
+        bar-chart data=visitsByCountry
+
+outlet
+/ TODO this all needs to be generated dynamically

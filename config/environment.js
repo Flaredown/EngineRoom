@@ -32,6 +32,55 @@ module.exports = function(environment) {
     // },
 
     KPI: {
+      "visits": {
+        "filters": {
+          "baseTimeframe": {
+            "start": "2015-05-20T00:00:00.000Z"
+          }
+        },
+        "metrics": [
+          {
+            "chartType": "stackedArea",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "pageviews",
+              "targetProperty": "session_id",
+              "groupBy": "user_agent.browser.name",
+              "interval": "daily"
+            },
+          },
+          {
+            "chartType": "ring",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "pageviews",
+              "targetProperty": "session_id",
+              "groupBy": "user_agent.browser.name",
+              "interval": "daily"
+            }
+          },
+          {
+            "chartType": "ring",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "pageviews",
+              "targetProperty": "session_id",
+              "groupBy": "user_agent.os.name",
+              "interval": "daily"
+            }
+          },
+          {
+            "chartType": "bar",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "pageviews",
+              "targetProperty": "session_id",
+              "groupBy": "user.current_location.country",
+              "interval": "daily"
+            }
+          }
+        ]
+      },
       "engagement": {
         "filters": {
           // baseTimeframe is underspecified for end: must be filled by the KPI with Time.now()
