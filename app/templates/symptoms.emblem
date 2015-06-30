@@ -1,0 +1,10 @@
+.engine-room.application
+  .container
+    h3 Symptoms
+    ul.small-block-grid-1.medium-block-grid-2.large-block-grid-3
+      li
+        histogram-chart data=nSymptoms
+      li    
+        bar-chart data=topSymptoms
+
+outlet
