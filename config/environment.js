@@ -81,6 +81,44 @@ module.exports = function(environment) {
           }
         ]
       },
+      "entries": {
+        "filters": {
+          "baseTimeframe": {
+            "start": "2015-05-20T00:00:00.000Z"
+          }
+        },
+        "metrics": [
+          {
+            "chartType": "line",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "user_id",
+              "interval": "daily"
+            },
+          },
+          {
+            "chartType": "histogram",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "keen.id",
+              "groupBy": "local_time_hour",
+              "interval": "daily"
+            }
+          },
+          {
+            "chartType": "histogram",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "keen.id",
+              "groupBy": "day_of_week",
+              "interval": "daily"
+            }
+          }
+        ]
+      },
       "engagement": {
         "filters": {
           // baseTimeframe is underspecified for end: must be filled by the KPI with Time.now()

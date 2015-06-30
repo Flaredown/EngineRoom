@@ -1,0 +1,13 @@
+.engine-room.application
+  .container
+    h3 Entries
+    ul.small-block-grid-1.medium-block-grid-2.large-block-grid-3
+      li
+        line-chart data=dailyEntries
+      li    
+        histogram-chart data=entriesByHour
+      li
+        histogram-chart data=entriesByDay
+
+outlet
+/ TODO this all needs to be generated dynamically
