@@ -38,48 +38,54 @@ module.exports = function(environment) {
             "start": "2015-05-20T00:00:00.000Z"
           }
         },
-        "metrics": [
-          {
-            "chartType": "stackedArea",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "pageviews",
-              "targetProperty": "session_id",
-              "groupBy": "user_agent.browser.name",
-              "interval": "daily"
+        "metrics": {
+          "keen": [
+            {
+              "chartType": "stackedArea",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "pageviews",
+                "targetProperty": "session_id",
+                "groupBy": "user_agent.browser.name",
+                "interval": "daily"
+              },
+              "order": 0
             },
-          },
-          {
-            "chartType": "ring",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "pageviews",
-              "targetProperty": "session_id",
-              "groupBy": "user_agent.browser.name",
-              "interval": "daily"
+            {
+              "chartType": "ring",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "pageviews",
+                "targetProperty": "session_id",
+                "groupBy": "user_agent.browser.name",
+                "interval": "daily"
+              },
+              "order": 1
+            },
+            {
+              "chartType": "ring",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "pageviews",
+                "targetProperty": "session_id",
+                "groupBy": "user_agent.os.name",
+                "interval": "daily"
+              },
+              "order": 2
+            },
+            {
+              "chartType": "bar",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "pageviews",
+                "targetProperty": "session_id",
+                "groupBy": "user.current_location.country",
+                "interval": "daily"
+              },
+              "order": 3
             }
-          },
-          {
-            "chartType": "ring",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "pageviews",
-              "targetProperty": "session_id",
-              "groupBy": "user_agent.os.name",
-              "interval": "daily"
-            }
-          },
-          {
-            "chartType": "bar",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "pageviews",
-              "targetProperty": "session_id",
-              "groupBy": "user.current_location.country",
-              "interval": "daily"
-            }
-          }
-        ]
+          ]
+        }
       },
       "entries": {
         "filters": {
@@ -87,37 +93,42 @@ module.exports = function(environment) {
             "start": "2015-05-20T00:00:00.000Z"
           }
         },
-        "metrics": [
-          {
-            "chartType": "line",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "entries",
-              "targetProperty": "user_id",
-              "interval": "daily"
+        "metrics": {
+          "keen": [
+            {
+              "chartType": "line",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "entries",
+                "targetProperty": "user_id",
+                "interval": "daily"
+              },
+              "order": 0
             },
-          },
-          {
-            "chartType": "histogram",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "entries",
-              "targetProperty": "keen.id",
-              "groupBy": "local_time_hour",
-              "interval": "daily"
+            {
+              "chartType": "histogram",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "entries",
+                "targetProperty": "keen.id",
+                "groupBy": "local_time_hour",
+                "interval": "daily"
+              },
+              "order": 1
+            },
+            {
+              "chartType": "histogram",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "entries",
+                "targetProperty": "keen.id",
+                "groupBy": "day_of_week",
+                "interval": "daily"
+              },
+              "order": 2
             }
-          },
-          {
-            "chartType": "histogram",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "entries",
-              "targetProperty": "keen.id",
-              "groupBy": "day_of_week",
-              "interval": "daily"
-            }
-          }
-        ]
+          ]
+        }
       },
       "engagement": {
         "filters": {
@@ -126,57 +137,66 @@ module.exports = function(environment) {
             "start": "2015-05-20T00:00:00.000Z"
           }
         },
-        "metrics": [
-          {
-            "chartType": "histogram",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "entries",
-              "targetProperty": "user_id",
-              "groupBy": "n_conditions",
-              "interval": "daily"
-            }
-          },
-          {
-            "chartType": "line",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "entries",
-              "targetProperty": "user_id",
-              "interval": "daily"
-            }
-          },
-          {
-            "chartType": "bar",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "conditions",
-              "targetProperty": "user_id",
-              "groupBy": "name",
-              "interval": "daily"
-            }
-          },
-          {
-            "chartType": "stackedArea",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "pageviews",
-              "targetProperty": "session_id",
-              "groupBy": "user_agent.browser.name",
-              "interval": "daily"
+        "metrics": {
+          "battleNet": [],
+          "googleAnalytics": [],
+          "keen": [
+            {
+              "chartType": "histogram",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "entries",
+                "targetProperty": "user_id",
+                "groupBy": "n_conditions",
+                "interval": "daily"
+              },
+              "order": 0
             },
-          },
-          {
-            "chartType": "ring",
-            "queryType": "count_unique",
-            "queryParams": {
-              "eventCollection": "pageviews",
-              "targetProperty": "session_id",
-              "groupBy": "user_agent.browser.name",
-              "interval": "daily"
+            {
+              "chartType": "line",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "entries",
+                "targetProperty": "user_id",
+                "interval": "daily"
+              },
+              "order": 1
+            },
+            {
+              "chartType": "bar",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "conditions",
+                "targetProperty": "user_id",
+                "groupBy": "name",
+                "interval": "daily"
+              },
+              "order": 2
+            },
+            {
+              "chartType": "stackedArea",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "pageviews",
+                "targetProperty": "session_id",
+                "groupBy": "user_agent.browser.name",
+                "interval": "daily"
+              },
+              "order": 3
+            },
+            {
+              "chartType": "ring",
+              "queryType": "count_unique",
+              "queryParams": {
+                "eventCollection": "pageviews",
+                "targetProperty": "session_id",
+                "groupBy": "user_agent.browser.name",
+                "interval": "daily"
+              },
+              "order": 4
             }
-          }
-        ]
+          ]
+        }
       }
     },
 

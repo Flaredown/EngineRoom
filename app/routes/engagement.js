@@ -1,8 +1,8 @@
 import Ember from "ember";
-import KPI from "../mixins/kpi";
+import KPI from "../routes/kpi";
 import config from "../config/environment";
 
-export default Ember.Route.extend(KPI, {
+export default KPI.extend({
 
   config: config.KPI.engagement
 
