@@ -6,5 +6,7 @@
         histogram-chart data=nSymptoms
       li    
         bar-chart data=topSymptoms
+      li
+        histogram-diff-chart data=diffSymptoms
 
 outlet

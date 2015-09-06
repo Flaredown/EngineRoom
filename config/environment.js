@@ -233,6 +233,18 @@ module.exports = function(environment) {
               "interval": "daily"
             },
             "order": 1
+          },
+          {
+            "chartType": "histogram-diff",
+            "dataSource": "keen",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "user_id",
+              "groupBy": "n_symptoms",
+              "interval": "daily"
+            },
+            "order": 2
           }
         ]
       }
