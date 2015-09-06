@@ -201,6 +201,40 @@ module.exports = function(environment) {
             "order": 4
           }
         ]
+      },
+      "symptoms": {
+        "filters": {
+          // baseTimeframe is underspecified for end: must be filled by the KPI with Time.now()
+          "baseTimeframe": {
+            "start": "2015-05-20T00:00:00.000Z"
+          }
+        },
+        "metrics": [
+          {
+            "chartType": "histogram",
+            "dataSource": "keen",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "entries",
+              "targetProperty": "user_id",
+              "groupBy": "n_symptoms",
+              "interval": "daily"
+            },
+            "order": 0
+          },
+          {
+            "chartType": "bar",
+            "dataSource": "keen",
+            "queryType": "count_unique",
+            "queryParams": {
+              "eventCollection": "symptoms",
+              "targetProperty": "user_id",
+              "groupBy": "name",
+              "interval": "daily"
+            },
+            "order": 1
+          }
+        ]
       }
     },
 

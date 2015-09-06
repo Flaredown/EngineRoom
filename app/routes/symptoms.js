@@ -4,6 +4,6 @@ import config from "../config/environment";
 
 export default Ember.Route.extend(KPI, {
 
-  config: config.KPI.visits
+  config: config.KPI.symptoms
 
 });
