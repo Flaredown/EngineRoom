@@ -31,12 +31,10 @@ export default Ember.Mixin.create({
     Ember.assert("must have chartEnter", Ember.isPresent(this.get("chartEnter")));
     Ember.assert("must have chartUpdate", Ember.isPresent(this.get("chartUpdate")));
 
-    if (this.get("svgExists")) {
-      this.updateD3();
-    } else {
+    if (!this.get("svgExists")) {
       this.setupD3();
-      this.updateD3();
     }
+    this.updateD3();
   }).on("didInsertElement"),
 
   colorPalette: FLAREDOWN_COLORS,

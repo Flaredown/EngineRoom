@@ -10,7 +10,7 @@ $helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
  */
 
 .engine-room.application {
-  background: #f2f2f2;
+  background: #ffffff;
   padding: 60px 20px 0;
   line-height: 1.2;
   font-family: $helvetica-neue-stack;
@@ -46,47 +46,72 @@ $helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
 }
 
 .chart-wrapper {
-  background: #fff;
-  border: 1px solid #e2e2e2;
-  border-radius: 3px;
-  margin-bottom: 10px;
-}
-.chart-wrapper .chart-title {
-  border-bottom: 1px solid #d7d7d7;
-  color: #666;
-  font-size: 14px;
-  font-weight: 200;
-  padding: 7px 10px 4px;
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 3px;
+    margin-bottom: 10px;
+
+    .chart-title {
+        border-bottom: 1px solid #d7d7d7;
+        color: #666;
+        font-size: 14px;
+        font-weight: 200;
+        padding: 7px 10px 4px;
+    }
+
+    .chart-stage {
+        /*min-height: 240px;*/
+        overflow: hidden;
+        padding: 5px 10px;
+        position: relative;
+    }
+
+    .chart-notes {
+        background: #fbfbfb;
+        border-top: 1px solid #e2e2e2;
+        color: #808080;
+        font-size: 12px;
+        padding: 8px 10px 5px;
+    }
 }
 
-.chart-wrapper .chart-stage {
-  /*min-height: 240px;*/
-  overflow: hidden;
-  padding: 5px 10px;
-  position: relative;
-}
-
-.chart-wrapper .chart-notes {
-  background: #fbfbfb;
-  border-top: 1px solid #e2e2e2;
-  color: #808080;
-  font-size: 12px;
-  padding: 8px 10px 5px;
-}
-
-// svg stuff for d3
+// D3 charts
 
 .legend {
   font-size: 12px;
 }
 
-.axis path {
-  stroke: #000;
-  fill: none;
+.axis {
+    font-size: 12px;
+
+    line, path {
+        stroke: #000;
+        fill: none;
+    }
+
+    &.transparent {
+        path {
+            stroke: none;
+        }
+    }
 }
 
-.axis {
-  font-size: 12px;
+.bar {
+    &.positive {
+        fill: rgb(140, 140, 140);
+    }
+
+    &.negative {
+        fill: rgb(240, 126, 110);
+    }
+
+    rect {
+        fill: darkgrey;
+    }
+}
+
+.baseline {
+    stroke: rgb(140, 140, 140);
 }
 
 text.graph-label {
