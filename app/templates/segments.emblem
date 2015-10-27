@@ -3,9 +3,15 @@
     h3 Segments
     ul.small-block-grid-1.medium-block-grid-2.large-block-grid-3
       li
-        histogram-segments-diff-chart data=numConditions chart-type="conditions"
+        histogram-segments-diff-chart is-segmented=isSegmented data=numConditions chart-type="conditions"
       li
-        histogram-segments-diff-chart data=numSymptoms chart-type="symptoms"
+        histogram-segments-diff-chart is-segmented=isSegmented data=numSymptoms chart-type="symptoms"
       li
-        histogram-segments-diff-chart data=numTreatments chart-type="treatments"
+        histogram-segments-diff-chart is-segmented=isSegmented data=numTreatments chart-type="treatments"
+      li
+        rank-segments-chart is-segmented=isSegmented data=topConditions chart-type="conditions"
+      li
+        rank-segments-chart is-segmented=isSegmented data=topSymptoms chart-type="symptoms"
+      li
+        rank-segments-chart is-segmented=isSegmented data=topTreatments chart-type="treatments"
 outlet

@@ -10,26 +10,25 @@ export default Ember.Component.extend({
      * @param category {string} "n_symptoms"
      * @param binSize
      */
-    chartSingleGroupCounts: function(el, rawData, binSize) {
+    chartSingleGroupCounts: function(rawData, binSize) {
         var mungedData = this.mungeData(rawData);
         var binSize = binSize || 2;
         var chartOptions = {
             binSize: binSize,
-            chartTypeName: mungedData.chartTypeName
+            chartTypeName: this.get('chart-type')
         };
 
-        var data = mungedData.data;
-        var keys = Object.keys(data);
+        var keys = Object.keys(mungedData);
 
         // keys of data, "_id"s, are the "number of conditions/symptoms/treatments". The value type is String.
-        var extent = d3.extent(Object.keys(data), function(d) {
+        var extent = d3.extent(Object.keys(mungedData), function(d) {
             return parseInt(d);
         });
         var min = extent[0];
         // histograms in R hist() are left-open and right-closed by default.
         var max = extent[1];
 
-        this.drawHistogramChart(data, max, min, chartOptions);
+        this.drawHistogramChart(mungedData, max, min, chartOptions);
     },
 
     /**
@@ -41,7 +40,7 @@ export default Ember.Component.extend({
      * @param comparisonName {string} group to compare against baseline
      * @param binSize {int} size of histogram bin
      */
-    chartBetweenGroupCounts: function(el, rawData, field, baselineName, comparisonName, binSize) {
+    chartBetweenGroupCounts: function(rawData, field, baselineName, comparisonName, binSize) {
         console.log('Comparing', comparisonName, 'against', baselineName, 'baseline');
 
         var mungedData = this.mungeSegmentedData(rawData, field, baselineName, comparisonName);
@@ -62,7 +61,7 @@ export default Ember.Component.extend({
         // histograms in R hist() are left-open and right-closed by default.
         var max = extent[1];
 
-        this.drawHistogramChart(el, diffDataRecord, max, min, chartOptions);
+        this.drawHistogramChart(diffDataRecord, max, min, chartOptions);
     },
     chartElement: computed("elementId", function() {
         return "#" + this.get("elementId");
@@ -101,18 +100,16 @@ export default Ember.Component.extend({
     }).on("didInsertElement"),
 
     /**
-     * Redraw the entire chart on data change, because the axes potentially change. 
+     * Redraw the entire chart on data change, because the axes potentially change.
      */
     drawD3: function() {
         var rawData = this.get('data');
-        //TODO: better way to determine if charting one group vs. multiple groups? This way is reasonable but could be brittle.
-        var isOneGroupSegment = rawData.length == 1;
+        var isSegmented = this.get('is-segmented');
 
-        var el = this.get('chartElement');
-        if (isOneGroupSegment) {
-            this.chartSingleGroupCounts(el, rawData, 'sex', 'male', 'female');
+        if (isSegmented) {
+            this.chartBetweenGroupCounts(rawData, 'sex', 'male', 'female');
         } else {
-            this.chartBetweenGroupCounts(el, rawData, 'sex', 'male', 'female');
+            this.chartSingleGroupCounts(rawData);
         }
     },
 
@@ -123,7 +120,7 @@ export default Ember.Component.extend({
      * @param min
      * @param chartOptions
      */
-    drawHistogramChart: function(el, data, max, min, chartOptions) {
+    drawHistogramChart: function(data, max, min, chartOptions) {
         // Chart options
         // TODO - best aspect ratio? Currently 7:5.
         var width = 420;
@@ -171,6 +168,18 @@ export default Ember.Component.extend({
         var minDiff = diffExtent[0];
         var maxDiff = diffExtent[1];
 
+        // TODO - figure out how to conditionally set the tooltip class attr by negative and positive, so that this
+        // splitting data step (and applying a different tooltip to each data set) is unnecessary
+        var negativeData = [];
+        var positiveData = [];
+        for (var i = 0; i < histData.length; i++) {
+            if (histData[i].diff < 0) {
+                negativeData.push(histData[i]);
+            } else {
+                positiveData.push(histData[i]);
+            }
+        }
+
         var binMargin = .2;
 
         // Scale for the placement of the bars
@@ -190,7 +199,7 @@ export default Ember.Component.extend({
             .scale(yScale)
             .orient("left");
 
-        var svg = d3.select(el).append("svg")
+        var svg = d3.select(this.get('chartElement')).append("svg")
             .attr("width", width)
             .attr("height", height)
             .append("g")
@@ -198,20 +207,52 @@ export default Ember.Component.extend({
             .attr('height', innerHeight)
             .attr("transform", "translate(" + outerMargin.left + "," + outerMargin.top + ")");
 
+        var positiveTip = d3.tip()
+            .attr('class', 'd3-tip top')
+            .offset([-10, 0])
+            .html(function(d) {
+                return "<strong class='tooltip-text'>Diff:</strong> <span class='tooltip-text'>" + d.diff + "</span>";
+            });
+
+        var negativeTip = d3.tip()
+            .attr('class', 'd3-tip top negative')
+            .offset([-10, 0])
+            .html(function(d) {
+                return "<strong class='tooltip-text'>Diff:</strong> <span class='tooltip-text'>" + d.diff + "</span>";
+            });
+
+        svg.call(positiveTip);
+        svg.call(negativeTip);
+
         // Change if we decide to not make all bins the same width
         var renderedBinWidth = Math.abs(xPositionScale(binSize - 2 * binMargin) - xPositionScale(0));
 
-        var bar = svg.selectAll(".bar")
-            .data(histData)
+        svg.selectAll(".bar.positive")
+            .data(positiveData)
             .enter().append("rect")
-            .attr("class", function(d) { return d.diff < 0 ? "bar negative" : "bar positive"; })
+            .attr("class", 'bar positive')
             .attr('x', function(d) { return xPositionScale(d.bin + binMargin); })
             .attr("y", function(d) { return yScale(Math.max(0, d.diff)); })
             .attr('width', renderedBinWidth)
-            .attr("height", function(d) { return Math.abs(yScale(d.diff) - yScale(0)); });
+            .attr("height", function(d) { return Math.abs(yScale(d.diff) - yScale(0)); })
+            .on('mouseover', positiveTip.show)
+            .on('mouseout', positiveTip.hide);
+
+        svg.selectAll(".bar.negative")
+            .data(negativeData)
+            .enter().append("rect")
+            .attr("class", 'bar negative')
+            .attr('x', function(d) { return xPositionScale(d.bin + binMargin); })
+            .attr("y", function(d) { return yScale(Math.max(0, d.diff)); })
+            .attr('width', renderedBinWidth)
+            .attr("height", function(d) { return Math.abs(yScale(d.diff) - yScale(0)); })
+            .on('mouseover', negativeTip.show)
+            .on('mouseout', negativeTip.hide);
+//            .on('mouseover', tip.show)
+//            .on('mouseout', tip.hide);
 
         svg.append("line")
-            .attr("class", "baseline")
+            .attr("class", "baseline-line")
             .attr("y1", yScale(0))
             .attr("y2", yScale(0))
             .attr("x1", outerMargin.left)
@@ -257,9 +298,7 @@ export default Ember.Component.extend({
             dataRecord[el._id] = el.count;
         });
 
-        return {
-            data: dataRecord
-        };
+        return dataRecord;
     },
 
     /**
