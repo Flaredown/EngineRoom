@@ -85,7 +85,6 @@ export default Ember.Component.extend({
             var comparisonCount = diffDataRecord[obj._id];
 
             if (comparisonCount === undefined) {
-                console.warn('Found baseline _id with no matching comparison _id:', obj._id);
                 diffDataRecord[obj._id] = 0 - obj.count;
             } else {
                 diffDataRecord[obj._id] = comparisonCount - obj.count;
@@ -122,9 +121,10 @@ export default Ember.Component.extend({
      */
     drawHistogramChart: function(data, max, min, chartOptions) {
         // Chart options
-        // TODO - best aspect ratio? Currently 7:5.
-        var width = 420;
-        var height = 300;
+        // TODO - best aspect ratio? Currently 7:5. Also move to controller so both histogram and rank charts have their
+        // width/height modified in one place.
+        var width = 476;
+        var height = 340;
         var outerMargin = {
             top: 10,
             right: 30,
@@ -227,7 +227,7 @@ export default Ember.Component.extend({
         // Change if we decide to not make all bins the same width
         var renderedBinWidth = Math.abs(xPositionScale(binSize - 2 * binMargin) - xPositionScale(0));
 
-        svg.selectAll(".bar.positive")
+        var positiveBars = svg.selectAll(".bar.positive")
             .data(positiveData)
             .enter().append("rect")
             .attr("class", 'bar positive')
@@ -238,7 +238,7 @@ export default Ember.Component.extend({
             .on('mouseover', positiveTip.show)
             .on('mouseout', positiveTip.hide);
 
-        svg.selectAll(".bar.negative")
+        var negativeBars = svg.selectAll(".bar.negative")
             .data(negativeData)
             .enter().append("rect")
             .attr("class", 'bar negative')

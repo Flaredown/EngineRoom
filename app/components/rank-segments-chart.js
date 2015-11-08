@@ -92,8 +92,8 @@ export default Ember.Component.extend({
      * following chart, except color corresponds to categories, not change deltas: https://pbs.twimg.com/media/Bg83Kh6CAAAFWpO.png.
      * @param data {object} either
      * {
-     *      baselineData: {groupBy: 'male', values: []},
-     *      comparisonData: {groupBy: 'male', values: []}
+     *      baselineData: [{count: 50, _id: 'Depression'}, ...],
+     *      comparisonData: [{count: 90, _id: 'IBS'}, ...],
      * } or
      *
      * {baselineData: []}
@@ -101,22 +101,24 @@ export default Ember.Component.extend({
      * @param comparisonName
      */
     drawRankChart: function(data, baselineName, comparisonName) {
-        // Chart settings
-        var width = 446;
-        var height = 333;
+        // TODO - best aspect ratio? Currently 7:5. Also move to controller so both histogram and rank charts have their
+        // width/height modified in one place.
+        var width = 476;
+        var height = 340;
         var outerMargin = {
             top: 10,
             right: 30,
             bottom: 35,
             left: 80
         };
+        var xLabelHeight = height - outerMargin.bottom;
+        // Margin between tick labels and the bottommost point on the y-axis.
         var axisLabelMargin = {
-            x: 10,
-            y: 3
+            x: 10
         };
         var chartTitleTopMargin = 10;
         var innerWidth = width - outerMargin.left - outerMargin.right;
-        var innerHeight = height - outerMargin.top - outerMargin.bottom;
+        var innerHeight = height - outerMargin.top - outerMargin.bottom - axisLabelMargin.x;
         var isBetweenGroupComparison = !!data.comparisonData;
         var chartType = this.get('chart-type');
         var title = 'Top ' + chartType;
@@ -282,39 +284,117 @@ export default Ember.Component.extend({
                 .on('mouseout', leftTip.hide);
 
             /**
-             * Given a baseline category, find rank and count of the corresponding category in the comparison data.
-             * @param category
+             * Used to construct linker lines. Maps index of object containing _id in baseline group to index of object
+             * containing corresponding _id in comparison group, and visa versa.
+             * @returns {'baseline': { 1: {count: 50, rank: 2}, 2: {count: 100, rank: 1}, ...}, ...}
              */
-            function getCorrespondingCategoryData(baselineCategory) {
-                for (var i = 0; i < comparisonData.length; i++) {
-                    if (comparisonData[i]._id === baselineCategory) {
-                        return {
-                            count: comparisonData[i].count,
-                            rank: i
-                        };
+            function constructGroupMap(baselineData, comparisonData) {
+                var groupMap = {'baseline': {}, 'comparison': {}};
+
+                for (var i = 0; i < baselineData.length; i++) {
+                    if (groupMap.baseline[i] == undefined) {
+                        var hasMatchingGroup = false;
+
+                        for (var j = 0; j < comparisonData.length; j++) {
+                            if (baselineData[i]._id === comparisonData[j]._id) {
+                                groupMap.baseline[i] = {
+                                    count: comparisonData[j].count,
+                                    rank: j
+                                };
+                                groupMap.comparison[j] = {
+                                    count: baselineData[i].count,
+                                    rank: i
+                                };
+                                hasMatchingGroup = true;
+                                break;
+                            }
+                        }
+                        if (!hasMatchingGroup) {
+                            groupMap.baseline[i] = null;
+                        }
                     }
                 }
-                return null;
+
+                // Find any comparison _id's without a matching baseline _id
+                for (var i = 0; i < comparisonData.length; i++) {
+                    if (groupMap.comparison[i] == undefined) {
+                        var hasMatchingGroup = false;
+
+                        for (var j = 0; j < baselineData.length; j++) {
+                            if (comparisonData[i]._id === baselineData[j]._id) {
+                                groupMap.comparison[i] = {
+                                    count: baselineData[j].count,
+                                    rank: j
+                                };
+                                groupMap.baseline[j] = {
+                                    count: comparisonData[i].count,
+                                    rank: i
+                                };
+                                hasMatchingGroup = true;
+                                break;
+                            }
+                        }
+                        if (!hasMatchingGroup) {
+                            groupMap.comparison[i] = null;
+                        }
+                    }
+                }
+
+                return groupMap;
             }
+
+            var groupMap = constructGroupMap(baselineData, comparisonData);
 
             var linkerLines = svg.selectAll("lines")
                 .data(baselineData)
                 .enter().append("line")
                 .attr("class", 'linkerLine')
                 .attr('x1', function(d) { return xPositionScale(groups[0]) - squareSideLengthScale(d.count) / 2; })
-                .attr('x2', function(d) {
-                    var cData = getCorrespondingCategoryData(d._id);
-                    if (cData != null) {
-                        return xPositionScale(groups[1]) - squareSideLengthScale(cData.count) / 2;
+                .attr('x2', function(d, i) {
+                    var cData = groupMap.baseline[i];
+
+                    if (cData == null) {
+                        // Has no corresponding rank in the top 10 of comparison group. Draw line to axis tick label of comparison group.
+                        return xPositionScale(groups[1]);
                     }
-                    return xPositionScale(groups[0]) - squareSideLengthScale(d.count) / 2;
+                    return xPositionScale(groups[1]) - squareSideLengthScale(cData.count) / 2;
                 })
                 .attr("y1", function(d, i) { return yScale(i);})
                 .attr("y2", function(d, i) {
-                    var cData = getCorrespondingCategoryData(d._id);
-                    if (cData != null) {
-                        return yScale(cData.rank);
+                    var cData = groupMap.baseline[i];
+
+                    if (cData == null) {
+                        // Has no corresponding rank in the top 10 of comparison group. Draw line to axis tick label of comparison group.
+                        return xLabelHeight;
                     }
+                    return yScale(cData.rank);
+                })
+                .attr("width", function(d) { return squareSideLengthScale(d.count);})
+                .attr("height", function(d) { return squareSideLengthScale(d.count);})
+                .style('stroke', function(d) { return colorScale(d._id)});
+
+            var orphanComparisonGroupLines = svg.selectAll("lines")
+                .data(comparisonData)
+                .enter().append("line")
+                .attr("class", 'linkerLine')
+                .attr('x1', function(d) { return xPositionScale(groups[1]) - squareSideLengthScale(d.count) / 2; })
+                .attr('x2', function(d, i) {
+                    var bData = groupMap.comparison[i];
+                    // Has no corresponding rank in the top 10 of baseline group. Draw line to axis tick label of baseline group.
+                    if (bData == null) {
+                        return xPositionScale(groups[0]);
+                    }
+                    return xPositionScale(groups[1]);
+                })
+                .attr("y1", function(d, i) { return yScale(i);})
+                .attr("y2", function(d, i) {
+                    var bData = groupMap.comparison[i];
+                    if (bData == null) {
+                        // Has no corresponding rank in the top 10 of group 2. Draw line to axis tick label of group 2.
+                        return xLabelHeight;
+                    }
+                    // Don't draw a line, because a line already exists between the comparison ranking and its
+                    // corresponding baseline ranking.
                     return yScale(i);
                 })
                 .attr("width", function(d) { return squareSideLengthScale(d.count);})
@@ -324,7 +404,7 @@ export default Ember.Component.extend({
 
         svg.append("g")
             .attr("class", "x axis transparent")
-            .attr("transform", "translate(0, " + (height - outerMargin.bottom) + ")")
+            .attr("transform", "translate(0, " + (xLabelHeight) + ")")
             .call(xAxis);
 
         svg.append("g")
