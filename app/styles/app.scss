@@ -3,7 +3,14 @@
 @import "foundation";
 
 $helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
-
+$negative-bar: rgb(240, 126, 110);
+$negative-bar-hover: #C8695B;
+$positive-bar: rgb(140, 140, 140);
+$positive-bar-hover: rgba(0, 0, 0, 0.8);
+$rect-hover: black;
+$tooltip-background: $positive-bar-hover;
+$tooltip-negative-background: $negative-bar-hover;
+$tooltip-text-color: white;
 
 /*
  * Full-page application style
@@ -97,20 +104,26 @@ $helvetica-neue-stack: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
 }
 
 .bar {
-    &.positive {
-        fill: rgb(140, 140, 140);
+    fill: $positive-bar;
+
+    &:hover {
+        fill: $positive-bar-hover;
     }
 
     &.negative {
-        fill: rgb(240, 126, 110);
-    }
-
-    rect {
-        fill: darkgrey;
+        fill: $negative-bar;
+        &:hover {
+            fill: $negative-bar-hover;
+        }
     }
 }
 
-.baseline {
+rect.square:hover {
+    stroke: $rect-hover;
+    stroke-width: 2;
+}
+
+.baseline-line {
     stroke: rgb(140, 140, 140);
 }
 
@@ -131,3 +144,61 @@ path.line {
   stroke-linecap: butt;
 }
 
+// D3 tooltips
+.d3-tip {
+    background-color: $tooltip-background;
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 2px;
+    z-index: 50;
+
+    &.negative {
+        background-color: $tooltip-negative-background;
+
+        &:after {
+            color: $tooltip-negative-background;
+        }
+    }
+
+    /* Creates a small triangle extender for the tooltip */
+    &:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 10px;
+        width: 100%;
+        line-height: 1;
+        color: $tooltip-background;
+        position: absolute;
+        pointer-events: none;
+    }
+
+    /* rightward tooltips - tooltip is to the right of content */
+    &.right:after {
+            content: "\25C0";
+            margin: -4px 0 0 0;
+            top: 50%;
+            left: -8px;
+    }
+
+    /* leftward tooltips */
+    &.left:after {
+        content: "\25B6";
+        margin: -4px 0 0 -1px;
+        top: 50%;
+        left: 100%;
+    }
+
+    /* top tooltip */
+    &.top:after {
+        content: "\25BC";
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+        text-align: center;
+    }
+}
+
+.tooltip-text {
+    color: $tooltip-text-color;
+}

@@ -11,6 +11,7 @@ var app = new EmberApp({
 });
 
 app.import('bower_components/d3/d3.js');
+app.import('bower_components/d3-tip/index.js');
 // Use `app.import` to add additional libraries to the generated
 // output files.
 //
